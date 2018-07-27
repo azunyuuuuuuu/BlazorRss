@@ -3,13 +3,30 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width">
+
     <title>BlazorRss</title>
+
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="lib/semantic-ui-css/semantic.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
+
+    <style type="text/css">
+        .main.container {
+            margin-left: 15rem;
+        }
+
+    </style>
 </head>
 <body>
-    <app>Loading...</app>
+    <app>
+        <div class="ui page active dimmer">
+            <div class="ui text loader">Loading...</div>
+        </div>
+    </app>
+
+    <script src="lib/jquery.js"></script>
+    <script src="lib/semantic-ui-css/semantic.js"></script>
 
     <script src="_framework/blazor.server.js"></script>
 </body>

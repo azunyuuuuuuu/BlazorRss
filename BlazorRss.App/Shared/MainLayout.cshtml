@@ -1,15 +1,11 @@
 ﻿@inherits BlazorLayoutComponent
 
-<div class="sidebar">
-    <NavMenu />
+<div class="ui left fixed vertical inverted menu">
+    <NavLink class="header item" href="" Match=NavLinkMatch.All>BlazorRss</NavLink>
+    <NavLink class="item" href="counter" Match=NavLinkMatch.All>Counter</NavLink>
+    <NavLink class="item" href="fetchdata" Match=NavLinkMatch.All>Fetch Data</NavLink>
 </div>
 
-<div class="main">
-    <div class="top-row px-4">
-        <a href="https://blazor.net" target="_blank" class="ml-md-auto">About</a>
-    </div>
-
-    <div class="content px-4">
-        @Body
-    </div>
+<div class="main container">
+    @Body
 </div>
