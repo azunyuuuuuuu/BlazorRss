@@ -17,6 +17,7 @@ namespace BlazorRss.Server
                     .AddCommandLine(args)
                     .Build())
                 .UseStartup<Startup>()
+                .UseUrls("http://*:5000/")
                 .Build();
     }
 }
