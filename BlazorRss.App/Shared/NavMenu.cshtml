@@ -1,32 +1,33 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">BlazorRss</a>
-    <button class="navbar-toggler" onclick=@ToggleNavMenu>
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+﻿@using BlazorRss.Shared.Models
+@inject BlazorRss.App.Models.ApplicationDbContext ApplicationDbContext
 
-<div class=@(collapseNavMenu ? "collapse" : null) onclick=@ToggleNavMenu>
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match=NavLinkMatch.All>
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
-    </ul>
+<div class="ui left fixed vertical inverted menu">
+    <NavLink class="header item" href="" Match=NavLinkMatch.All>BlazorRss</NavLink>
+    <NavLink class="item" href="counter" Match=NavLinkMatch.All>Counter</NavLink>
+    <NavLink class="item" href="fetchdata" Match=NavLinkMatch.All>Fetch Data</NavLink>
+
+    <div class="ui item list">
+        @if (Feeds != null)
+        {
+            @foreach (var feed in Feeds)
+            {
+                <div class="item">
+                    <i class="right triangle icon"></i> @feed.Name
+                </div>
+            }
+        }
+    </div>
 </div>
 
 @functions {
+    IReadOnlyList<Feed> Feeds;
+
     bool collapseNavMenu = true;
+
+    protected override async Task OnInitAsync()
+    {
+        Feeds = await ApplicationDbContext.GetAllFeedsAsync();
+    }
 
     void ToggleNavMenu()
     {

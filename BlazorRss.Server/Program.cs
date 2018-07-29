@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BlazorRss.App.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -11,29 +12,39 @@ namespace BlazorRss.Server
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = BuildWebHost(args);
 
             using (var scope = host.Services.CreateScope())
-                DoAdditionalServiceSetup(scope);
+                await ExecuteAditionalServiceSetupAsync(scope);
 
             host.Run();
         }
 
-        private static void DoAdditionalServiceSetup(IServiceScope scope)
+        private static async Task ExecuteAditionalServiceSetupAsync(IServiceScope scope)
         {
             var services = scope.ServiceProvider;
             var logger = services.GetRequiredService<ILogger<Program>>();
 
-            DoInitialDatabaseSeed(services.GetRequiredService<ApplicationDbContext>(), logger);
+            await SeedWithSampleDataAsync(services.GetRequiredService<ApplicationDbContext>(), logger);
         }
 
-        private static void DoInitialDatabaseSeed(ApplicationDbContext context, ILogger<Program> logger)
+        private static async Task SeedWithSampleDataAsync(ApplicationDbContext context, ILogger<Program> logger)
         {
             try
             {
-                context.Database.Migrate();
+                await context.Database.EnsureCreatedAsync();
+
+                if ((await context.Feeds.CountAsync()) > 0)
+                    return;
+
+                await context.Feeds.AddRangeAsync(
+                    new Shared.Models.Feed { Name = "Test Feed 1" },
+                    new Shared.Models.Feed { Name = "Test Feed 2" }
+                );
+
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
