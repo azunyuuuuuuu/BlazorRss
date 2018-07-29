@@ -12,6 +12,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorRss.Shared\BlazorRss.Shared.csproj" />
+  </ItemGroup>
+  
 </Project>

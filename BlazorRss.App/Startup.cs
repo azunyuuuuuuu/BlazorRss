@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Blazor.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using BlazorRss.App.Services;
+using BlazorRss.App.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorRss.App
 {
@@ -11,6 +13,9 @@ namespace BlazorRss.App
             // Since Blazor is running on the server, we can use an application service
             // to read the forecast data.
             services.AddSingleton<WeatherForecastService>();
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite("Data Source=ApplicationDb.db"));
         }
 
         public void Configure(IBlazorApplicationBuilder app)

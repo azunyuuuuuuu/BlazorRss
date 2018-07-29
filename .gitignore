@@ -621,3 +621,4 @@ ASALocalRun/
 
 
 # End of https://www.gitignore.io/api/csharp,aspnetcore,visualstudio,visualstudiocode
+BlazorRss.Server/ApplicationDb.db
