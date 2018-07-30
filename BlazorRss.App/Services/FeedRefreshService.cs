@@ -38,7 +38,7 @@ namespace BlazorRss.App.Services
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Service stopped");
-            
+
             return Task.CompletedTask;
         }
 
@@ -62,12 +62,10 @@ namespace BlazorRss.App.Services
             _logger.LogDebug($"Refreshing {feeds.Count} feeds");
 
             foreach (var feed in feeds)
-            {
-                await RefreshSingleFeedAsync(feed);
-            }
+                await RefreshSingleFeedAsync(context, feed);
         }
 
-        private async Task RefreshSingleFeedAsync(Feed feed)
+        private async Task RefreshSingleFeedAsync(ApplicationDbContext context, Feed feed)
         {
             _logger.LogDebug($"Refreshing feed {feed.Name}");
 
