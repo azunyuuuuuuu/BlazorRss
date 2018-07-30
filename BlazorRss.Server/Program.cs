@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BlazorRss.App.Models;
 using Microsoft.AspNetCore;
@@ -36,12 +37,19 @@ namespace BlazorRss.Server
             {
                 await context.Database.EnsureCreatedAsync();
 
-                if ((await context.Feeds.CountAsync()) > 0)
+                if ((await context.Categories.CountAsync()) > 0)
                     return;
 
-                await context.Feeds.AddRangeAsync(
-                    new Shared.Models.Feed { Name = "Test Feed 1" },
-                    new Shared.Models.Feed { Name = "Test Feed 2" }
+                await context.Categories.AddRangeAsync(
+                    new Shared.Models.Category
+                    {
+                        Name = "Test Category",
+                        Feeds = new List<Shared.Models.Feed>
+                        {
+                            new Shared.Models.Feed { Name = "Test Feed 1" },
+                            new Shared.Models.Feed { Name = "Test Feed 2" }
+                        }
+                    }
                 );
 
                 await context.SaveChangesAsync();

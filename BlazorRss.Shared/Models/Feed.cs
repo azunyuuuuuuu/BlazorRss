@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace BlazorRss.Shared.Models
 {
@@ -10,8 +11,11 @@ namespace BlazorRss.Shared.Models
 
         public Category Category { get; set; }
 
-        public DateTimeOffset TimeAdded { get; set; }
-        public DateTimeOffset TimeModified { get; set; }
-        public DateTimeOffset TimeLastUpdated { get; set; }
+        public DateTimeOffset DateAdded { get; set; }
+        public DateTimeOffset DateModified { get; set; }
+        public DateTimeOffset DateLastUpdate { get; set; }
+        public TimeSpan RefreshInterval { get; set; }
+
+        public List<Article> Articles { get; set; }
     }
 }

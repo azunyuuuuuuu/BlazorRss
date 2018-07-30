@@ -6,27 +6,36 @@
     <NavLink class="item" href="counter" Match=NavLinkMatch.All>Counter</NavLink>
     <NavLink class="item" href="fetchdata" Match=NavLinkMatch.All>Fetch Data</NavLink>
 
-    <div class="ui item list">
-        @if (Feeds != null)
-        {
-            @foreach (var feed in Feeds)
+    @if (Categories != null)
+    {
+        <div class="ui item list">
+            @foreach (var category in Categories)
             {
                 <div class="item">
-                    <i class="right triangle icon"></i> @feed.Name
+                    <i class="right triangle icon"></i>
+                        @category.Name
+                    <div class="header">
+                    </div>
+                    <div class="list">
+                        @foreach (var feed in category.Feeds)
+                        {
+                            <a class="item" href="#">@feed.Name</a>
+                        }
+                    </div>
                 </div>
             }
-        }
-    </div>
+        </div>
+    }
 </div>
 
 @functions {
-    IReadOnlyList<Feed> Feeds;
+    IReadOnlyList<Category> Categories;
 
     bool collapseNavMenu = true;
 
     protected override async Task OnInitAsync()
     {
-        Feeds = await ApplicationDbContext.GetAllFeedsAsync();
+        Categories = await ApplicationDbContext.GetAllCategoriesAsync();
     }
 
     void ToggleNavMenu()
