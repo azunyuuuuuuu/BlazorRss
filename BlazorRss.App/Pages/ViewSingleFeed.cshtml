@@ -1,0 +1,9 @@
+﻿@using System
+@page "/feed/{feedid:guid}"
+
+<h1> @FeedId </h1>
+
+@functions {
+    [Parameter]
+    private Guid FeedId { get; set; }
+}
