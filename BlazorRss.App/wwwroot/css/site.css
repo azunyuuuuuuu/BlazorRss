@@ -1,4 +1,7 @@
-﻿
+﻿.sticky.menu {
+  position: sticky !important;
+}
+
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */

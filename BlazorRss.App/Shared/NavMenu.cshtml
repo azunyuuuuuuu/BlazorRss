@@ -1,22 +1,21 @@
 ﻿@using BlazorRss.Shared.Models
 @inject BlazorRss.App.Models.ApplicationDbContext ApplicationDbContext
 
-<div class="ui left fixed vertical inverted menu">
-    <NavLink class="header item" href="" Match=NavLinkMatch.All>BlazorRss</NavLink>
-    <NavLink class="item" href="counter" Match=NavLinkMatch.All>Counter</NavLink>
-    <NavLink class="item" href="fetchdata" Match=NavLinkMatch.All>Fetch Data</NavLink>
+<div class="ui top sticky fixed inverted borderless violet menu">
+    <div class="ui container">
+        <div class="header item" href="">BlazorRss</div>
+        <NavLink class="item" href="" Match=NavLinkMatch.All>Home</NavLink>
+        <NavLink class="item" href="counter" Match=NavLinkMatch.All>Counter</NavLink>
+        <NavLink class="item" href="fetchdata" Match=NavLinkMatch.All>Fetch Data</NavLink>
 
-    @if (Categories != null)
-    {
-        <div class="ui item list">
+        @if (Categories != null)
+        {
             @foreach (var category in Categories)
             {
-                <div class="item">
-                    <i class="right triangle icon"></i>
-                        @category.Name
-                    <div class="header">
-                    </div>
-                    <div class="list">
+                <div class="ui simple dropdown item">
+                    @category.Name
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
                         @foreach (var feed in category.Feeds)
                         {
                             <a class="item" href="#">@feed.Name</a>
@@ -24,8 +23,8 @@
                     </div>
                 </div>
             }
-        </div>
-    }
+        }
+    </div>
 </div>
 
 @functions {
