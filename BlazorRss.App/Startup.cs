@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using BlazorRss.App.Services;
 using BlazorRss.App.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace BlazorRss.App
 {
@@ -16,6 +17,8 @@ namespace BlazorRss.App
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=ApplicationDb.db"));
+
+            services.AddHostedService<FeedRefreshService>();
         }
 
         public void Configure(IBlazorApplicationBuilder app)
