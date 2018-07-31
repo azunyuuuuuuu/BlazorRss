@@ -19,6 +19,7 @@ namespace BlazorRss.App
                 options.UseSqlite("Data Source=ApplicationDb.db"));
 
             services.AddHostedService<FeedRefreshService>();
+            services.AddHttpClient();
         }
 
         public void Configure(IBlazorApplicationBuilder app)

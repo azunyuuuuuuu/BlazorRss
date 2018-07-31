@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 
 namespace BlazorRss.App.Services
 {
@@ -15,11 +16,13 @@ namespace BlazorRss.App.Services
     {
         private readonly IServiceProvider _services;
         private readonly ILogger<FeedRefreshService> _logger;
+        private readonly HttpClient _client;
 
-        public FeedRefreshService(IServiceProvider services, ILogger<FeedRefreshService> logger)
+        public FeedRefreshService(IServiceProvider services, ILogger<FeedRefreshService> logger, IHttpClientFactory clientFactory)
         {
             _services = services;
             _logger = logger;
+            _client = clientFactory.CreateClient();
         }
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -59,10 +62,20 @@ namespace BlazorRss.App.Services
 
         private async Task RefreshSingleFeedAsync(ApplicationDbContext context, Feed feed)
         {
-            _logger.LogInformation($"Refreshing feed {feed.Name}");
+            try
+            {
+                _logger.LogInformation($"Refreshing feed {feed.Name}");
 
-            await Task.Delay(10); // dummy context
+                var response = await _client.GetAsync(feed.Url);
+
+                var responsetext = await response.Content.ReadAsStringAsync();
+
+                // TODO: implement rss/atom/etc. feed parser
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while refreshing \"{feed.Name}\"");
+            }
         }
-
     }
 }

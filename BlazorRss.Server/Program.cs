@@ -46,8 +46,14 @@ namespace BlazorRss.Server
                         Name = "Test Category",
                         Feeds = new List<Shared.Models.Feed>
                         {
-                            new Shared.Models.Feed { Name = "Test Feed 1" },
-                            new Shared.Models.Feed { Name = "Test Feed 2" }
+                            new Shared.Models.Feed {
+                                Name = "YouTube: LiveOverflow channel feed",
+                                Url = "https://www.youtube.com/feeds/videos.xml?channel_id=UClcE-kVhqyiHCcjYwcpfj9w",
+                                RefreshInterval = TimeSpan.FromSeconds(10)
+                                },
+                            new Shared.Models.Feed {
+                                Name = "Test Feed 2"
+                                }
                         }
                     }
                 );
