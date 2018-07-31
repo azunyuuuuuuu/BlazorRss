@@ -7,6 +7,8 @@ namespace BlazorRss.Shared.Models
         public Guid ArticleId { get; set; }
         public Feed Feed { get; set; }
 
+        public bool Read { get; set; }
+
         public DateTimeOffset DatePublished { get; set; }
         public DateTimeOffset DateUpdated { get; set; }
 
