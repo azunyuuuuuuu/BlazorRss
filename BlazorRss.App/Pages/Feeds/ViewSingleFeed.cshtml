@@ -1,0 +1,25 @@
+﻿@using System
+@using BlazorRss.Shared.Models
+@page "/feed/{feedid:guid}"
+
+@inject BlazorRss.App.Models.ApplicationDbContext _context
+
+@if (feed != null)
+{
+    <h1 class="ui header">
+        @feed.Name
+        <div class="sub header">@feed.FeedId</div>
+    </h1>
+}
+
+@functions {
+    [Parameter]
+    private Guid FeedId { get; set; }
+
+    Feed feed;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        feed = await _context.GetFeed(FeedId);
+    }
+}
