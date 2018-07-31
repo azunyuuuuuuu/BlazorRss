@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlazorRss.App.Services
 {
-    public class FeedRefreshService : IHostedService, IDisposable
+    public class FeedRefreshService : BackgroundService
     {
         private readonly IServiceProvider _services;
         private readonly ILogger<FeedRefreshService> _logger;
@@ -22,44 +22,36 @@ namespace BlazorRss.App.Services
             _logger = logger;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Service started");
+            _logger.LogInformation("FeedRefreshService is starting");
 
-            Task.Run(async () =>
+            while (!stoppingToken.IsCancellationRequested)
             {
-                while (!cancellationToken.IsCancellationRequested)
-                    await DoWork(cancellationToken);
-            }, cancellationToken);
+                try
+                {
+                    using (var scope = _services.CreateScope())
+                    {
+                        var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+                        await RefreshAllFeeds(context);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error occurred");
+                }
 
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Service stopped");
-
-            return Task.CompletedTask;
-        }
-
-        private async Task DoWork(CancellationToken cancellationToken)
-        {
-            await Task.Delay(1000);
-
-            using (var scope = _services.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-                await RefreshAllFeeds(context);
+                await Task.Delay(TimeSpan.FromMinutes(1));
             }
 
-            _logger.LogDebug("ProcessingLoop completed");
+            _logger.LogInformation("FeedRefreshService is stopping");
         }
 
         private async Task RefreshAllFeeds(ApplicationDbContext context)
         {
             var feeds = await context.Feeds.ToListAsync();
 
-            _logger.LogDebug($"Refreshing {feeds.Count} feeds");
+            _logger.LogInformation($"Refreshing {feeds.Count} feeds");
 
             foreach (var feed in feeds)
                 await RefreshSingleFeedAsync(context, feed);
@@ -67,14 +59,10 @@ namespace BlazorRss.App.Services
 
         private async Task RefreshSingleFeedAsync(ApplicationDbContext context, Feed feed)
         {
-            _logger.LogDebug($"Refreshing feed {feed.Name}");
+            _logger.LogInformation($"Refreshing feed {feed.Name}");
 
             await Task.Delay(10); // dummy context
         }
 
-        public void Dispose()
-        {
-
-        }
     }
 }
