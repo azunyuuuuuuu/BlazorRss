@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +31,12 @@ namespace BlazorRss.App.Models
                 .Include(x => x.Feeds)
                 .ThenInclude(x => x.Articles)
                 .ToListAsync();
+        }
+
+        public async Task<Feed> GetFeed(Guid id)
+        {
+            return await Feeds
+                .FindAsync(id);
         }
     }
 }
