@@ -36,7 +36,7 @@ namespace BlazorRss.App.Services
                     using (var scope = _services.CreateScope())
                     {
                         var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-                        await RefreshAllFeeds(context);
+                        await RefreshAllFeedsAsync(context);
                     }
                 }
                 catch (Exception ex)
@@ -50,7 +50,7 @@ namespace BlazorRss.App.Services
             _logger.LogInformation("FeedRefreshService is stopping");
         }
 
-        private async Task RefreshAllFeeds(ApplicationDbContext context)
+        private async Task RefreshAllFeedsAsync(ApplicationDbContext context)
         {
             var feeds = await context.Feeds.ToListAsync();
 
