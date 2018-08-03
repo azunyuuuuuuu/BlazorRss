@@ -10,6 +10,28 @@
         @feed.Name
         <div class="sub header">@feed.FeedId</div>
     </h1>
+
+    <div class="ui feed">
+        @foreach (var article in feed.Articles)
+        {
+            <div class="event">
+                <div class="label">
+                    <i class="big newspaper icon"></i>
+                </div>
+                <div class="content">
+                    <div class="summary">
+                        <a href="@article.ArticleUrl">@article.Title</a>
+                        <div class="date">
+                            @article.DatePublished
+                        </div>
+                    </div>
+                    <div class="extra text">
+                        @article.Description
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 @functions {
