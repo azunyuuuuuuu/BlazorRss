@@ -49,10 +49,20 @@ namespace BlazorRss.Server
                             new Shared.Models.Feed {
                                 Name = "YouTube: LiveOverflow channel feed",
                                 Url = "https://www.youtube.com/feeds/videos.xml?channel_id=UClcE-kVhqyiHCcjYwcpfj9w",
-                                RefreshInterval = TimeSpan.FromSeconds(10)
+                                RefreshInterval = TimeSpan.FromSeconds(10),
+                                DateAdded = DateTimeOffset.UtcNow
                                 },
                             new Shared.Models.Feed {
-                                Name = "Test Feed 2"
+                                Name = "Ars Technica",
+                                Url = "http://feeds.arstechnica.com/arstechnica/index/",
+                                RefreshInterval = TimeSpan.FromSeconds(10),
+                                DateAdded = DateTimeOffset.UtcNow
+                                },
+                            new Shared.Models.Feed {
+                                Name = "Neowin",
+                                Url = "http://feeds.feedburner.com/neowin-main",
+                                RefreshInterval = TimeSpan.FromSeconds(10),
+                                DateAdded = DateTimeOffset.UtcNow
                                 }
                         }
                     }
