@@ -1,0 +1,86 @@
+@using System
+@using BlazorRss.Shared.Models
+@using Microsoft.EntityFrameworkCore
+
+@page "/manage/categories"
+
+@inject BlazorRss.App.Models.ApplicationDbContext _context
+
+<div class="ui container">
+    @if (categories != null)
+    {
+        <h1 class="ui header">
+            Manage Categories
+        </h1>
+
+        <table class="ui single line selectable striped very basic table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="right aligned collapsing"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in categories)
+                {
+                    <tr>
+                        <td>@category.Name</td>
+                        <td class="right aligned">
+                            <button class="ui button">Edit</button>
+                            <button class="ui negative button" onclick="@(e=>ActionRemoveCategory(@category))">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="2">
+                        <div class="ui fluid action input">
+                            <input bind="@NewCategoryName" type="text" name="feed-url" placeholder="Category name..." />
+                            <button class="ui positive button" onclick="@ActionAddCategory">Add</button>
+                        </div>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    }
+</div>
+
+@functions {
+    [Parameter]
+    private Guid FeedId { get; set; }
+
+    List<Category> categories;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        categories = await _context.Categories.ToListAsync();
+    }
+
+    string NewCategoryName;
+    async Task ActionAddCategory()
+    {
+        if(string.IsNullOrWhiteSpace(NewCategoryName))
+            return;
+
+        _context.Categories.Add(new Category{ Name = NewCategoryName });
+        await _context.SaveChangesAsync();
+        NewCategoryName = "";
+
+        await LoadData();
+    }
+
+    async Task ActionRemoveCategory(Category category)
+    {
+        _context.Categories.Remove(category);
+
+        await _context.SaveChangesAsync();
+
+        await LoadData();
+    }
+}
