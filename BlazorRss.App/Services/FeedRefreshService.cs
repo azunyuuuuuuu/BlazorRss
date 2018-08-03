@@ -108,6 +108,7 @@ namespace BlazorRss.App.Services
 
                                 var article = new Article
                                 {
+                                    Feed = feed,
                                     UniqueId = item.Id,
                                     Title = item.Title,
                                     Author = item.Contributors.FirstOrDefault()?.Name,
@@ -117,7 +118,7 @@ namespace BlazorRss.App.Services
                                     DateUpdated = item.LastUpdated
                                 };
 
-                                feed.Articles.Add(article);
+                                context.Articles.Add(article);
 
                                 await context.SaveChangesAsync();
 
