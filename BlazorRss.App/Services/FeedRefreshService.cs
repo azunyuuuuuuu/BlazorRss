@@ -115,7 +115,7 @@ namespace BlazorRss.App.Services
                                     UniqueId = item.Id,
                                     Title = item.Title,
                                     Author = item.Contributors.FirstOrDefault()?.Name,
-                                    Content = item.Description,
+                                    Description = item.Description,
                                     ArticleUrl = item.Links.First().Uri.ToString(), // TODO: change this to something proper
                                     DatePublished = item.Published,
                                     DateUpdated = item.LastUpdated
