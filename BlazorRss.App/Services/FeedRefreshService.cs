@@ -103,7 +103,7 @@ namespace BlazorRss.App.Services
                             case SyndicationElementType.Item:
                                 var item = await feedreader.ReadItem();
 
-                                if (feed.Articles.Where(x => x.UniqueId == item.Id && x.DateUpdated != item.LastUpdated).Count() > 0)
+                                if (feed.Articles.Where(x => x.UniqueId == item.Id && x.DateUpdated == item.LastUpdated).Count() > 0)
                                     break;
 
                                 var article = new Article
