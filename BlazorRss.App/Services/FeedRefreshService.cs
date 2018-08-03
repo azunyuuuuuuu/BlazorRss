@@ -65,6 +65,9 @@ namespace BlazorRss.App.Services
 
         private async Task RefreshSingleFeedAsync(ApplicationDbContext context, Feed feed)
         {
+            if (DateTimeOffset.Now < feed.DateLastUpdate + feed.RefreshInterval)
+                return;
+
             try
             {
                 _logger.LogInformation($"Refreshing feed {feed.Name}");
@@ -129,6 +132,9 @@ namespace BlazorRss.App.Services
                                 break;
                         }
                     }
+
+                    feed.DateLastUpdate = DateTimeOffset.UtcNow;
+                    await context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
