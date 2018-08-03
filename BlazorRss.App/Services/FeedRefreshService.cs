@@ -53,7 +53,9 @@ namespace BlazorRss.App.Services
 
         private async Task RefreshAllFeedsAsync(ApplicationDbContext context)
         {
-            var feeds = await context.Feeds.ToListAsync();
+            var feeds = await context.Feeds
+                .Include(x => x.Articles)
+                .ToListAsync();
 
             _logger.LogInformation($"Refreshing {feeds.Count} feeds");
 
@@ -98,24 +100,27 @@ namespace BlazorRss.App.Services
                     {
                         switch (feedreader.ElementType)
                         {
-                            case SyndicationElementType.Category:
-                                var Category = await feedreader.ReadCategory();
-                                break;
-
-                            case SyndicationElementType.Image:
-                                var image = await feedreader.ReadImage();
-                                break;
-
                             case SyndicationElementType.Item:
                                 var item = await feedreader.ReadItem();
-                                break;
 
-                            case SyndicationElementType.Link:
-                                var link = await feedreader.ReadLink();
-                                break;
+                                if (feed.Articles.Where(x => x.UniqueIdentifier == item.Id && x.DateUpdated != item.LastUpdated).Count() > 0)
+                                    break;
 
-                            case SyndicationElementType.Person:
-                                var person = await feedreader.ReadPerson();
+                                var article = new Article
+                                {
+                                    UniqueIdentifier = item.Id,
+                                    Title = item.Title,
+                                    Author = item.Contributors.FirstOrDefault()?.Name,
+                                    Content = item.Description,
+                                    ArticleUrl = item.Links.First().Uri.ToString(), // TODO: change this to something proper
+                                    DatePublished = item.Published,
+                                    DateUpdated = item.LastUpdated
+                                };
+
+                                feed.Articles.Add(article);
+
+                                await context.SaveChangesAsync();
+
                                 break;
 
                             default:

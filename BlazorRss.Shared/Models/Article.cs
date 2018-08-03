@@ -6,6 +6,7 @@ namespace BlazorRss.Shared.Models
     {
         public Guid ArticleId { get; set; }
         public Feed Feed { get; set; }
+        public string UniqueIdentifier { get; set; }
 
         public bool Read { get; set; }
 
@@ -16,5 +17,7 @@ namespace BlazorRss.Shared.Models
         public string Author { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+
+        public bool Deleted { get; set; }
     }
 }
