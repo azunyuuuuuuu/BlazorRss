@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
+using Microsoft.SyndicationFeed;
 
 namespace BlazorRss.App.Services
 {
@@ -68,9 +69,61 @@ namespace BlazorRss.App.Services
 
                 var response = await _client.GetAsync(feed.Url);
 
-                var responsetext = await response.Content.ReadAsStringAsync();
+                using (var xmlreader = System.Xml.XmlReader.Create(await response.Content.ReadAsStreamAsync()))
+                {
+                    while (xmlreader.Read())
+                    {
+                        if (xmlreader.NodeType != System.Xml.XmlNodeType.Element)
+                            continue;
+                        break;
+                    }
 
-                // TODO: implement rss/atom/etc. feed parser
+                    ISyndicationFeedReader feedreader;
+
+                    switch (xmlreader.Name)
+                    {
+                        case "feed":
+                            feedreader = new Microsoft.SyndicationFeed.Atom.AtomFeedReader(xmlreader);
+                            break;
+
+                        case "rss":
+                            feedreader = new Microsoft.SyndicationFeed.Rss.RssFeedReader(xmlreader);
+                            break;
+
+                        default:
+                            throw new Exception($"Root element of {xmlreader.Name} could not be recognized as a valid feed type.");
+                    }
+
+                    while (await feedreader.Read())
+                    {
+                        switch (feedreader.ElementType)
+                        {
+                            case SyndicationElementType.Category:
+                                var Category = await feedreader.ReadCategory();
+                                break;
+
+                            case SyndicationElementType.Image:
+                                var image = await feedreader.ReadImage();
+                                break;
+
+                            case SyndicationElementType.Item:
+                                var item = await feedreader.ReadItem();
+                                break;
+
+                            case SyndicationElementType.Link:
+                                var link = await feedreader.ReadLink();
+                                break;
+
+                            case SyndicationElementType.Person:
+                                var person = await feedreader.ReadPerson();
+                                break;
+
+                            default:
+                                var content = await feedreader.ReadContent();
+                                break;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
