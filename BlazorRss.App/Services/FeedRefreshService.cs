@@ -75,78 +75,88 @@ namespace BlazorRss.App.Services
                 var response = await _client.GetAsync(feed.Url);
 
                 using (var xmlreader = System.Xml.XmlReader.Create(await response.Content.ReadAsStreamAsync()))
-                {
-                    while (xmlreader.Read())
-                    {
-                        if (xmlreader.NodeType != System.Xml.XmlNodeType.Element)
-                            continue;
-                        break;
-                    }
-
-                    ISyndicationFeedReader feedreader;
-
-                    switch (xmlreader.Name)
-                    {
-                        case "feed":
-                            feedreader = new Microsoft.SyndicationFeed.Atom.AtomFeedReader(xmlreader);
-                            break;
-
-                        case "rss":
-                            feedreader = new Microsoft.SyndicationFeed.Rss.RssFeedReader(xmlreader);
-                            break;
-
-                        default:
-                            throw new Exception($"Root element of {xmlreader.Name} could not be recognized as a valid feed type.");
-                    }
-
-                    while (await feedreader.Read())
-                    {
-                        switch (feedreader.ElementType)
-                        {
-                            case SyndicationElementType.Item:
-                                var item = await feedreader.ReadItem();
-
-                                if (feed.Articles.Where(x => x.UniqueId == item.Id && x.DateUpdated == item.LastUpdated).Count() > 0)
-                                    break;
-
-                                var article = new Article
-                                {
-                                    Feed = feed,
-                                    UniqueId = item.Id,
-                                    Title = item.Title,
-                                    Author = item.Contributors.FirstOrDefault()?.Name,
-                                    Description = item.Description,
-                                    Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
-                                    ArticleUrl = item.Links.First().Uri.ToString(), // TODO: change this to something proper
-                                    DatePublished = item.Published,
-                                    DateUpdated = item.LastUpdated
-                                };
-
-                                context.Articles.Add(article);
-
-                                await context.SaveChangesAsync();
-
-                                break;
-
-                            default:
-                                var content = await feedreader.ReadContent();
-
-                                if (string.IsNullOrWhiteSpace(feed.Name))
-                                    if (content.Name == "title")
-                                        feed.Name = content.Value;
-
-                                break;
-                        }
-                    }
-
-                    feed.DateLastUpdate = DateTimeOffset.UtcNow;
-                    await context.SaveChangesAsync();
-                }
+                    await ParseFeedStream(context, feed, xmlreader);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error occurred while refreshing \"{feed.Name}\"");
             }
+        }
+
+        private async Task ParseFeedStream(ApplicationDbContext context, Feed feed, System.Xml.XmlReader xmlreader)
+        {
+            while (xmlreader.Read())
+                if (xmlreader.NodeType == System.Xml.XmlNodeType.Element)
+                    break;
+
+            var feedreader = GetFeedReader(xmlreader);
+
+            while (await feedreader.Read())
+                await ParseReadElement(context, feed, feedreader);
+
+            feed.DateLastUpdate = DateTimeOffset.UtcNow;
+            await context.SaveChangesAsync();
+        }
+
+        private ISyndicationFeedReader GetFeedReader(System.Xml.XmlReader xmlreader)
+        {
+            switch (xmlreader.Name)
+            {
+                case "feed": return new Microsoft.SyndicationFeed.Atom.AtomFeedReader(xmlreader);
+                case "rss": return new Microsoft.SyndicationFeed.Rss.RssFeedReader(xmlreader);
+                default: throw new Exception($"Root element of {xmlreader.Name} could not be recognized as a valid feed type.");
+            }
+        }
+
+        private async Task ParseReadElement(ApplicationDbContext context, Feed feed, ISyndicationFeedReader feedreader)
+        {
+            switch (feedreader.ElementType)
+            {
+                case SyndicationElementType.Item:
+                    var item = await feedreader.ReadItem();
+
+                    if (feed.Articles.Where(x => x.UniqueId == item.Id && x.DateUpdated == item.LastUpdated).Count() > 0)
+                        break;
+
+                    var article = CreateArticleFromItem(feed, item);
+
+                    context.Articles.Add(article);
+
+                    await context.SaveChangesAsync();
+
+                    break;
+
+                default:
+                    var content = await feedreader.ReadContent();
+
+                    SetFeedNameIfNotSet(feed, content);
+
+                    break;
+            }
+        }
+
+        private Article CreateArticleFromItem(Feed feed, ISyndicationItem item)
+        {
+            var article = new Article
+            {
+                Feed = feed,
+                UniqueId = item.Id,
+                Title = item.Title,
+                Author = item.Contributors.FirstOrDefault()?.Name,
+                Description = item.Description,
+                Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
+                ArticleUrl = item.Links.First().Uri.ToString(), // TODO: change this to something proper
+                DatePublished = item.Published,
+                DateUpdated = item.LastUpdated
+            };
+            return article;
+        }
+
+        private void SetFeedNameIfNotSet(Feed feed, ISyndicationContent content)
+        {
+            if (string.IsNullOrWhiteSpace(feed.Name))
+                if (content.Name == "title")
+                    feed.Name = content.Value;
         }
     }
 }
