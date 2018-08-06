@@ -77,6 +77,7 @@
 
     async Task ActionRemoveFeed(Feed feed)
     {
+        _context.Articles.RemoveRange(_context.Articles.Where(x => x.Feed == feed));
         _context.Feeds.Remove(feed);
 
         await _context.SaveChangesAsync();
