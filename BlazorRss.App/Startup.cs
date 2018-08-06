@@ -11,10 +11,6 @@ namespace BlazorRss.App
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            // Since Blazor is running on the server, we can use an application service
-            // to read the forecast data.
-            services.AddSingleton<WeatherForecastService>();
-
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=ApplicationDb.db"));
 
