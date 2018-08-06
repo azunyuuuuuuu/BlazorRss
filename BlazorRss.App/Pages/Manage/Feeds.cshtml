@@ -1,0 +1,86 @@
+@using System
+@using BlazorRss.Shared.Models
+@using Microsoft.EntityFrameworkCore
+
+@page "/manage/feeds"
+
+@inject BlazorRss.App.Models.ApplicationDbContext _context
+
+<div class="ui container">
+    @if (feeds != null)
+    {
+        <h1 class="ui header">
+            Manage Feeds
+        </h1>
+
+        <table class="ui single line selectable striped very basic table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="right aligned collapsing"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var feed in feeds)
+                {
+                    <tr>
+                        <td>@feed.Name</td>
+                        <td class="right aligned">
+                            <button class="ui button">Edit</button>
+                            <button class="ui negative button" onclick="@(e=>ActionRemoveFeed(@feed))">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="2">
+                        <div class="ui fluid action input">
+                            <input bind="@NewFeedUrl" type="text" name="feed-url" placeholder="Feed URL..." />
+                            <button class="ui positive button" onclick="@ActionAddFeed">Add</button>
+                        </div>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    }
+</div>
+
+@functions {
+    [Parameter]
+    private Guid FeedId { get; set; }
+
+    List<Feed> feeds;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        feeds = await _context.Feeds.ToListAsync();
+    }
+
+    string NewFeedUrl;
+    async Task ActionAddFeed()
+    {
+        if(string.IsNullOrWhiteSpace(NewFeedUrl))
+            return;
+
+        _context.Feeds.Add(new Feed{ Url = NewFeedUrl });
+        await _context.SaveChangesAsync();
+        NewFeedUrl = "";
+
+        await LoadData();
+    }
+
+    async Task ActionRemoveFeed(Feed feed)
+    {
+        _context.Feeds.Remove(feed);
+
+        await _context.SaveChangesAsync();
+
+        await LoadData();
+    }
+}
