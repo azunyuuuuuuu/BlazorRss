@@ -116,7 +116,7 @@ namespace BlazorRss.App.Services
                                     Title = item.Title,
                                     Author = item.Contributors.FirstOrDefault()?.Name,
                                     Description = item.Description,
-                                    Tags = string.Join(", ", item.Categories.Select(x=>x.Name)),
+                                    Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
                                     ArticleUrl = item.Links.First().Uri.ToString(), // TODO: change this to something proper
                                     DatePublished = item.Published,
                                     DateUpdated = item.LastUpdated
@@ -130,6 +130,11 @@ namespace BlazorRss.App.Services
 
                             default:
                                 var content = await feedreader.ReadContent();
+
+                                if (string.IsNullOrWhiteSpace(feed.Name))
+                                    if (content.Name == "title")
+                                        feed.Name = content.Value;
+
                                 break;
                         }
                     }
