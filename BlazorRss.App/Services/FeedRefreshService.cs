@@ -118,26 +118,19 @@ namespace BlazorRss.App.Services
                     if (feed.Articles.Where(x => x.UniqueId == item.Id && x.DateUpdated == item.LastUpdated).Count() > 0)
                         break;
 
-                    var article = CreateArticleFromItem(feed, item);
-
-                    context.Articles.Add(article);
+                    context.Articles.Add(CreateArticleFromItem(feed, item));
 
                     await context.SaveChangesAsync();
-
                     break;
 
                 default:
-                    var content = await feedreader.ReadContent();
-
-                    SetFeedNameIfNotSet(feed, content);
-
+                    SetFeedNameIfNotSet(feed, await feedreader.ReadContent());
                     break;
             }
         }
 
         private Article CreateArticleFromItem(Feed feed, ISyndicationItem item)
-        {
-            var article = new Article
+            => new Article
             {
                 Feed = feed,
                 UniqueId = item.Id,
@@ -149,8 +142,6 @@ namespace BlazorRss.App.Services
                 DatePublished = item.Published,
                 DateUpdated = item.LastUpdated
             };
-            return article;
-        }
 
         private void SetFeedNameIfNotSet(Feed feed, ISyndicationContent content)
         {

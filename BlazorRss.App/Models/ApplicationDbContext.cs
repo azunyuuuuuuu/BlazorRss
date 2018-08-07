@@ -19,24 +19,21 @@ namespace BlazorRss.App.Models
         public DbSet<Article> Articles { get; set; }
 
         public async Task<List<Feed>> GetAllFeedsAsync()
-        {
-            return await Feeds
+            => await Feeds
                 .Include(x => x.Category)
                 .ToListAsync();
-        }
+
 
         public async Task<List<Category>> GetAllCategoriesAsync()
-        {
-            return await Categories
+            => await Categories
                 .Include(x => x.Feeds)
                 .ThenInclude(x => x.Articles)
                 .ToListAsync();
-        }
+
 
         public async Task<Feed> GetFeed(Guid id)
-        {
-            return await Feeds
+            => await Feeds
                 .FindAsync(id);
-        }
+
     }
 }
