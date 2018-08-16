@@ -1,0 +1,77 @@
+@using System
+@using BlazorRss.Shared.Models
+@using Microsoft.EntityFrameworkCore
+
+@page "/manage/feeds/{feedid:guid}"
+
+@inject BlazorRss.App.Models.ApplicationDbContext _context
+
+<div class="ui container">
+    @if (feed != null)
+    {
+        <h1 class="ui header">
+            Manage Feed @feed.Name
+        </h1>
+
+        <form class="ui form">
+            <div class="field">
+                <label>Name</label>
+                <input type="text" bind="@feed.Name" placeholder="Name..." />
+            </div>
+            <div class="field">
+                <label>URL</label>
+                <input type="text" bind="@feed.Url" placeholder="URL..." />
+            </div>
+            <div class="field">
+                <select class="ui fluid dropdown" bind="categoryid">
+                    @if (categories != null)
+                    {
+                        @foreach (var category in categories)
+                        {
+                            <option value=@category.CategoryId>@category.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="ui button" onclick=@SaveData>Save</div>
+        </form>
+    }
+</div>
+
+@functions {
+    [Parameter]
+    private Guid FeedId { get; set; }
+
+    Feed feed;
+    List<Category> categories;
+
+    string categoryid;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        feed = await _context.Feeds
+            .Include(x=>x.Category)
+            .SingleOrDefaultAsync(x => x.FeedId == FeedId);
+        
+        if (feed.Category != null)
+            categoryid = feed.Category.CategoryId.ToString();
+
+        categories = await _context.Categories
+            .ToListAsync();
+    }
+
+    async Task SaveData()
+    {
+        if (categoryid != null)
+            feed.Category = categories.Single(x => x.CategoryId == Guid.Parse(categoryid));
+
+        _context.Update(feed);
+
+        await _context.SaveChangesAsync();
+    }
+}

@@ -1,6 +1,7 @@
 @using System
 @using BlazorRss.Shared.Models
 @using Microsoft.EntityFrameworkCore
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 @page "/manage/feeds"
 
@@ -26,8 +27,8 @@
                     <tr>
                         <td>@feed.Name</td>
                         <td class="right aligned">
-                            <button class="ui button">Edit</button>
-                            <button class="ui negative button" onclick="@(e=>ActionRemoveFeed(@feed))">Delete</button>
+                            <button class="ui button" onclick="@(e => ActionEditFeed(@feed))">Edit</button>
+                            <button class="ui negative button" onclick="@(e => ActionRemoveFeed(@feed))">Delete</button>
                         </td>
                     </tr>
                 }
@@ -83,5 +84,10 @@
         await _context.SaveChangesAsync();
 
         await LoadData();
+    }
+
+    void ActionEditFeed(Feed feed)
+    {
+        UriHelper.NavigateTo($"/manage/feeds/{feed.FeedId}");
     }
 }
