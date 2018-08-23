@@ -1,5 +1,6 @@
 @using System
 @using BlazorRss.Shared.Models
+@using Humanizer;
 
 @page "/feeds/"
 @page "/feeds/{feedid:guid}"
@@ -53,7 +54,7 @@
                         <i class="large sticky note outline middle aligned icon"></i>
                         <div class="content">
                             <a href="@article.ArticleUrl" class="header">@article.Title</a>
-                            <div class="description">@article.DatePublished</div>
+                            <div class="description">@article.DatePublished.Humanize()</div>
                         </div>
                     </div>
                 }
