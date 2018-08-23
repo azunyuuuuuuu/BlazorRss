@@ -22,8 +22,12 @@
                                     supported by Chrome and Opera */
 }
 
-app > div.main.container
+app > div.main
 {
   position: relative;
   top:3.5em;
+}
+
+.ui.no-padding {
+  padding: 0 !important;
 }
