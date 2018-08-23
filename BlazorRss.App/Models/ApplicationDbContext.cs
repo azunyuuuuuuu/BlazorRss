@@ -27,6 +27,7 @@ namespace BlazorRss.App.Models
         public async Task<List<Category>> GetAllCategoriesAsync()
             => await Categories
                 .Include(x => x.Feeds)
+                .OrderBy(x => x.Name)
                 .ToListAsync();
 
         public async Task<Feed> GetFeed(Guid id)

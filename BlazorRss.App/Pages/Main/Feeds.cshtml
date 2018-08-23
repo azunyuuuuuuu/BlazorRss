@@ -3,6 +3,7 @@
 
 @page "/feeds/"
 @page "/feeds/{feedid:guid}"
+@page "/feeds/{feedid:guid}/{articleid:guid}"
 
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper _uriHelper
 @inject BlazorRss.App.Models.ApplicationDbContext _context
@@ -15,20 +16,20 @@
             @foreach (var category in Categories)
             {
                 <div class="item">
-                    <div class="header">
+                    <a class="header">
                         @category.Name
-                    </div>
+                    </a>
 
                     <div class="menu">
                         @foreach (var feed in category.Feeds)
                         {
                             if (feed.FeedId == FeedId)
                             {
-                                <div class="active item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</div>
+                                <a class="active item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</a>
                             }
                             else
                             {
-                                <div class="item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</div>
+                                <a class="item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</a>
                             }
                         }
                     </div>
@@ -48,10 +49,10 @@
             <div class="ui relaxed divided list">
                 @foreach(var article in Articles)
                 {
-                    <div class="item">
+                    <div class="item" onclick="@(e => NavigateToArticle(@FeedId, @article.ArticleId))">
                         <i class="large sticky note outline middle aligned icon"></i>
                         <div class="content">
-                            <a href="" class="header">@article.Title</a>
+                            <a href="@article.ArticleUrl" class="header">@article.Title</a>
                             <div class="description">@article.DatePublished</div>
                         </div>
                     </div>
@@ -61,7 +62,15 @@
     </div>
 
     <div class="ui eight wide column">
-        <!-- Selected Article Content -->
+        @if (_article != null)
+        {
+            <div class="ui segment">
+                @((MarkupString)@_article.Description)
+            </div>
+            <div class="ui segment">
+                @((MarkupString)@_article.Content)
+            </div>
+        }
     </div>
 </div>
 
@@ -72,7 +81,11 @@
 
     [Parameter]
     private Guid FeedId { get; set; }
-    Feed feed;
+    Feed _feed;
+
+    [Parameter]
+    private Guid ArticleId { get; set; }
+    Article _article;
 
     protected override async Task OnInitAsync()
     {
@@ -81,15 +94,25 @@
     
     protected override async Task OnParametersSetAsync()
     {
-        if (FeedId != null)
+        if (FeedId != null && FeedId != Guid.Empty)
         {
-            feed = await _context.GetFeed(FeedId);
+            _feed = await _context.GetFeed(FeedId);
             Articles = await _context.GetArticlesForFeed(FeedId);
+        }
+
+        if (ArticleId != null && ArticleId != Guid.Empty)
+        {
+            _article = await _context.Articles.FindAsync(ArticleId);
         }
     }
 
     void NavigateToFeed(Guid feedid)
     {
         _uriHelper.NavigateTo($"/feeds/{feedid}");
+    }
+
+    void NavigateToArticle(Guid feedid, Guid articleid)
+    {
+        _uriHelper.NavigateTo($"/feeds/{feedid}/{articleid}");
     }
 }
