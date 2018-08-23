@@ -1,0 +1,95 @@
+@using System
+@using BlazorRss.Shared.Models
+
+@page "/feeds/"
+@page "/feeds/{feedid:guid}"
+
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper _uriHelper
+@inject BlazorRss.App.Models.ApplicationDbContext _context
+
+
+<div class="ui grid container">
+    <div class="ui three wide column">
+        <!-- Category and Feed List -->
+        <div class="ui vertical secondary fluid pointing menu">
+            @foreach (var category in Categories)
+            {
+                <div class="item">
+                    <div class="header">
+                        @category.Name
+                    </div>
+
+                    <div class="menu">
+                        @foreach (var feed in category.Feeds)
+                        {
+                            if (feed.FeedId == FeedId)
+                            {
+                                <div class="active item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</div>
+                            }
+                            else
+                            {
+                                <div class="item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="ui five wide column">
+        <!-- Article List -->
+        @if(Articles == null)
+        {
+            <div class="ui center aligned container">No Feed loaded</div>
+        }
+        else
+        {
+            <div class="ui relaxed divided list">
+                @foreach(var article in Articles)
+                {
+                    <div class="item">
+                        <i class="large sticky note outline middle aligned icon"></i>
+                        <div class="content">
+                            <a href="" class="header">@article.Title</a>
+                            <div class="description">@article.DatePublished</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="ui eight wide column">
+        <!-- Selected Article Content -->
+    </div>
+</div>
+
+
+@functions {
+    IReadOnlyList<Category> Categories;
+    IReadOnlyList<Article> Articles;
+
+    [Parameter]
+    private Guid FeedId { get; set; }
+    Feed feed;
+
+    protected override async Task OnInitAsync()
+    {
+        Categories = await _context.GetAllCategoriesAsync();
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (FeedId != null)
+        {
+            feed = await _context.GetFeed(FeedId);
+            Articles = await _context.GetArticlesForFeed(FeedId);
+        }
+    }
+
+    void NavigateToFeed(Guid feedid)
+    {
+        _uriHelper.NavigateTo($"/feeds/{feedid}");
+    }
+}

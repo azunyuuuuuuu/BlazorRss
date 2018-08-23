@@ -1,28 +1,12 @@
 ﻿@using BlazorRss.Shared.Models
 @inject BlazorRss.App.Models.ApplicationDbContext ApplicationDbContext
 
-<div class="ui top sticky fixed inverted borderless violet menu">
+<div class="ui top fixed inverted borderless violet menu">
     <div class="ui container">
         <div class="header item" href="">BlazorRss</div>
         <NavLink class="item" href="" Match=NavLinkMatch.All>Home</NavLink>
+        <NavLink class="item" href="/feeds/" Match=NavLinkMatch.All>Feeds</NavLink>
         
-        @if (Categories != null)
-        {
-            @foreach (var category in Categories)
-            {
-                <div class="ui simple dropdown item">
-                    @category.Name
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        @foreach (var feed in category.Feeds)
-                        {
-                            <a class="item" href="/feed/@feed.FeedId">@feed.Name</a>
-                        }
-                    </div>
-                </div>
-            }
-        }
-
         <div class="ui simple dropdown item">
             Manage
             <i class="dropdown icon"></i>
@@ -35,14 +19,7 @@
 </div>
 
 @functions {
-    IReadOnlyList<Category> Categories;
-
     bool collapseNavMenu = true;
-
-    protected override async Task OnInitAsync()
-    {
-        Categories = await ApplicationDbContext.GetAllCategoriesAsync();
-    }
 
     void ToggleNavMenu()
     {

@@ -27,13 +27,20 @@ namespace BlazorRss.App.Models
         public async Task<List<Category>> GetAllCategoriesAsync()
             => await Categories
                 .Include(x => x.Feeds)
-                .ThenInclude(x => x.Articles)
                 .ToListAsync();
-
 
         public async Task<Feed> GetFeed(Guid id)
             => await Feeds
                 .FindAsync(id);
 
+        public async Task<List<Article>> GetArticlesForFeed(Guid feedid, int skip = 0, int take = 10)
+            => await Articles
+                .Include(x => x.Feed)
+                .Where(x => x.Feed.FeedId == feedid)
+                .OrderByDescending(x => x.DateUpdated)
+                .OrderByDescending(x => x.DatePublished)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
     }
 }
