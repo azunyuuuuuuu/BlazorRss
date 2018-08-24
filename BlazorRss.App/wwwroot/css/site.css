@@ -40,7 +40,7 @@ app > div.main
 }
 
 #feedview .ui.column {
-  overflow-y: overlay;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 #feedview .ui.tertiary.column {
