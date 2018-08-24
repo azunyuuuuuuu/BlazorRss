@@ -114,8 +114,9 @@ namespace BlazorRss.App.Services
             {
                 case SyndicationElementType.Item:
                     var item = await feedreader.ReadItem();
+                    var itemidentifier = item.Links.FirstOrDefault().Uri.AbsoluteUri;
 
-                    if (feed.Articles.Where(x => x.UniqueId == item.Id && x.DateUpdated == item.LastUpdated).Count() > 0)
+                    if (feed.Articles.Where(x => x.UniqueId == itemidentifier && x.DateUpdated == item.LastUpdated).Count() > 0)
                         break;
 
                     context.Articles.Add(CreateArticleFromItem(feed, item));
