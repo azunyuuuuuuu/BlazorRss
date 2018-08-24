@@ -10,76 +10,72 @@
 @inject BlazorRss.App.Models.ApplicationDbContext _context
 
 
-<div class="ui grid">
-    <div class="ui three wide no-padding column">
+<div id="feedview" class="ui grid">
+    <div class="ui three wide tertiary column">
         <!-- Category and Feed List -->
-        <div class="ui tertiary basic segment">
-            <div class="ui vertical secondary fluid pointing menu">
-                @foreach (var category in Categories)
-                {
-                    <div class="item">
-                        <a class="header">
-                            @category.Name
-                        </a>
+            <div class="ui vertical secondary fluid menu">
+            @foreach (var category in Categories)
+            {
+                <div class="item">
+                    <a class="header">
+                        @category.Name
+                    </a>
 
-                        <div class="menu">
-                            @foreach (var feed in category.Feeds)
+                    <div class="menu">
+                        @foreach (var feed in category.Feeds)
+                        {
+                            if (feed.FeedId == FeedId)
                             {
-                                if (feed.FeedId == FeedId)
-                                {
-                                    <a class="active item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</a>
-                                }
-                                else
-                                {
-                                    <a class="item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</a>
-                                }
+                                <a class="active item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</a>
                             }
-                        </div>
+                            else
+                            {
+                                <a class="item" onclick="@(e => NavigateToFeed(@feed.FeedId))">@feed.Name</a>
+                            }
+                        }
                     </div>
-                }
-            </div>
-        </div>
-    </div>
-
-    <div class="ui five wide no-padding column">
-        <!-- Article List -->
-        <div class="ui secondary basic segment">
-            @if(Articles == null)
-            {
-                <div class="ui center aligned disabled basic segment">No Feed loaded</div>
-            }
-            else
-            {
-                <div class="ui relaxed divided link list">
-                    @foreach(var article in Articles)
-                    {
-                        @if(article.ArticleId == ArticleId)
-                        {
-                            <div class="item active" onclick="@(e => NavigateToArticle(@FeedId, @article.ArticleId))">
-                                <i class="large sticky note outline middle aligned icon"></i>
-                                <div class="content">
-                                    <a class="header">@article.Title</a>
-                                    <div class="description">@article.DatePublished.Humanize()</div>
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="item" onclick="@(e => NavigateToArticle(@FeedId, @article.ArticleId))">
-                                <i class="large sticky note outline middle aligned icon"></i>
-                                <div class="content">
-                                    <a class="header">@article.Title</a>
-                                    <div class="description">@article.DatePublished.Humanize()</div>
-                                </div>
-                            </div>
-                        }
-                    }
                 </div>
             }
         </div>
     </div>
 
-    <div class="ui eight wide no-padding column">
+    <div class="ui five wide secondary column">
+        <!-- Article List -->
+        @if(Articles == null)
+        {
+            <div class="ui center aligned disabled basic segment">No Feed loaded</div>
+        }
+        else
+        {
+            <div class="ui relaxed divided link list">
+                @foreach(var article in Articles)
+                {
+                    @if(article.ArticleId == ArticleId)
+                    {
+                        <div class="item active" onclick="@(e => NavigateToArticle(@FeedId, @article.ArticleId))">
+                            <i class="large sticky note outline middle aligned icon"></i>
+                            <div class="content">
+                                <a class="header">@article.Title</a>
+                                <div class="description">@article.DatePublished.Humanize()</div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="item" onclick="@(e => NavigateToArticle(@FeedId, @article.ArticleId))">
+                            <i class="large sticky note outline middle aligned icon"></i>
+                            <div class="content">
+                                <a class="header">@article.Title</a>
+                                <div class="description">@article.DatePublished.Humanize()</div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+
+    <div class="ui eight wide column">
         @if (_article == null)
         {
             <div class="ui center aligned disabled basic segment">No article loaded</div>

@@ -31,3 +31,24 @@ app > div.main
 .ui.no-padding {
   padding: 0 !important;
 }
+
+
+#feedview.ui.grid {
+  margin: 0rem;
+  height:100vh;
+  overflow: hidden;
+}
+
+#feedview .ui.column {
+  overflow-y: overlay;
+  overflow-x: hidden;
+}
+#feedview .ui.tertiary.column {
+  background: #DCDDDE;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+#feedview .ui.secondary.column {
+  background: #F3F4F5;
+  color: rgba(0, 0, 0, 0.6);
+}
