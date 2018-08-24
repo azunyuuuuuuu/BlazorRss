@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.1.0" />
     <PackageReference Include="Microsoft.SyndicationFeed.ReaderWriter" Version="1.0.2" />
+    <PackageReference Include="SmartReader" Version="0.5.0" />
   </ItemGroup>
 
   <ItemGroup>

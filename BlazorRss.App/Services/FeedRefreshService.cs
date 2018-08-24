@@ -119,7 +119,17 @@ namespace BlazorRss.App.Services
                     if (feed.Articles.Where(x => x.UniqueId == itemidentifier && x.DateUpdated == item.LastUpdated).Count() > 0)
                         break;
 
-                    context.Articles.Add(CreateArticleFromItem(feed, item));
+                    var article = CreateArticleFromItem(feed, item, itemidentifier);
+
+                    var parsedarticlepage = await SmartReader.Reader.ParseArticleAsync(article.ArticleUrl);
+
+                    if (parsedarticlepage.IsReadable)
+                    {
+                        article.Description = parsedarticlepage.Excerpt;
+                        article.Content = parsedarticlepage.Content;
+                    }
+
+                    context.Articles.Add(article);
 
                     await context.SaveChangesAsync();
                     break;
@@ -130,11 +140,12 @@ namespace BlazorRss.App.Services
             }
         }
 
-        private Article CreateArticleFromItem(Feed feed, ISyndicationItem item)
+        private Article CreateArticleFromItem(Feed feed, ISyndicationItem item, string itemidentifier)
             => new Article
             {
                 Feed = feed,
-                UniqueId = item.Id,
+                UniqueId = itemidentifier,
+                // UniqueId = item.Id,
                 Title = item.Title,
                 Author = item.Contributors.FirstOrDefault()?.Name,
                 Description = item.Description,
