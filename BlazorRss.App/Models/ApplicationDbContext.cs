@@ -34,7 +34,7 @@ namespace BlazorRss.App.Models
             => await Feeds
                 .FindAsync(id);
 
-        public async Task<List<Article>> GetArticlesForFeed(Guid feedid, int skip = 0, int take = 10)
+        public async Task<List<Article>> GetArticlesForFeed(Guid feedid, int skip = 0, int take = 20)
             => await Articles
                 .Include(x => x.Feed)
                 .Where(x => x.Feed.FeedId == feedid)
