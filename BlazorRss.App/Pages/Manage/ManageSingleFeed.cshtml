@@ -4,7 +4,7 @@
 
 @page "/manage/feeds/{feedid:guid}"
 
-@inject BlazorRss.App.Models.ApplicationDbContext _context
+@inherits ManageSingleFeedBase
 
 <div class="ui container">
     @if (feed != null)
@@ -37,41 +37,3 @@
         </form>
     }
 </div>
-
-@functions {
-    [Parameter]
-    private Guid FeedId { get; set; }
-
-    Feed feed;
-    List<Category> categories;
-
-    string categoryid;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await LoadData();
-    }
-
-    async Task LoadData()
-    {
-        feed = await _context.Feeds
-            .Include(x=>x.Category)
-            .SingleOrDefaultAsync(x => x.FeedId == FeedId);
-        
-        if (feed.Category != null)
-            categoryid = feed.Category.CategoryId.ToString();
-
-        categories = await _context.Categories
-            .ToListAsync();
-    }
-
-    async Task SaveData()
-    {
-        if (categoryid != null)
-            feed.Category = categories.Single(x => x.CategoryId == Guid.Parse(categoryid));
-
-        _context.Update(feed);
-
-        await _context.SaveChangesAsync();
-    }
-}

@@ -4,7 +4,7 @@
 
 @page "/manage/categories"
 
-@inject BlazorRss.App.Models.ApplicationDbContext _context
+@inherits ManageCategoriesBase
 
 <div class="ui container">
     @if (categories != null)
@@ -45,44 +45,3 @@
         </table>
     }
 </div>
-
-@functions {
-    [Parameter]
-    private Guid FeedId { get; set; }
-
-    List<Category> categories;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await LoadData();
-    }
-
-    async Task LoadData()
-    {
-        categories = await _context.Categories
-            .AsNoTracking()
-            .ToListAsync();
-    }
-
-    string NewCategoryName;
-    async Task ActionAddCategory()
-    {
-        if(string.IsNullOrWhiteSpace(NewCategoryName))
-            return;
-
-        _context.Categories.Add(new Category{ Name = NewCategoryName });
-        await _context.SaveChangesAsync();
-        NewCategoryName = "";
-
-        await LoadData();
-    }
-
-    async Task ActionRemoveCategory(Category category)
-    {
-        _context.Categories.Remove(category);
-
-        await _context.SaveChangesAsync();
-
-        await LoadData();
-    }
-}

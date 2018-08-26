@@ -6,9 +6,7 @@
 @page "/feeds/{feedid:guid}"
 @page "/feeds/{feedid:guid}/{articleid:guid}"
 
-@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper _uriHelper
-@inject BlazorRss.App.Models.ApplicationDbContext _context
-
+@inherits FeedsBase
 
 <div id="feedview" class="ui grid">
     <div class="ui three wide tertiary column">
@@ -91,56 +89,3 @@
         }
     </div>
 </div>
-
-
-@functions {
-    IReadOnlyList<Category> Categories;
-    IReadOnlyList<Article> Articles;
-
-    [Parameter]
-    private Guid FeedId { get; set; }
-    Feed _feed;
-
-    [Parameter]
-    private Guid ArticleId { get; set; }
-    Article _article;
-
-    protected override async Task OnInitAsync()
-    {
-        Categories = await _context.GetAllCategoriesAsync();
-    }
-    
-    protected override async Task OnParametersSetAsync()
-    {
-        if (FeedId != null && FeedId != Guid.Empty)
-        {
-            _feed = await _context.GetFeed(FeedId);
-            Articles = await _context.GetArticlesForFeed(FeedId);
-        }
-
-        if (ArticleId != null && ArticleId != Guid.Empty)
-        {
-            _article = await _context.Articles.FindAsync(ArticleId);
-        }
-    }
-
-    void NavigateToFeed(Guid feedid)
-    {
-        _feed = null;
-        _article = null;
-        FeedId = Guid.Empty;
-        ArticleId = Guid.Empty;
-
-        _uriHelper.NavigateTo($"/feeds/{feedid}");
-    }
-
-    void NavigateToArticle(Guid feedid, Guid articleid)
-    {
-        // _feed = null;
-        // _article = null;
-        // FeedId = Guid.Empty;
-        // ArticleId = Guid.Empty;
-
-        _uriHelper.NavigateTo($"/feeds/{feedid}/{articleid}");
-    }
-}
