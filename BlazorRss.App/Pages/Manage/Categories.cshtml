@@ -59,7 +59,9 @@
 
     async Task LoadData()
     {
-        categories = await _context.Categories.ToListAsync();
+        categories = await _context.Categories
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     string NewCategoryName;

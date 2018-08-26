@@ -21,6 +21,7 @@ namespace BlazorRss.App.Models
         public async Task<List<Feed>> GetAllFeedsAsync()
             => await Feeds
                 .Include(x => x.Category)
+                .AsNoTracking()
                 .ToListAsync();
 
 
@@ -28,6 +29,7 @@ namespace BlazorRss.App.Models
             => await Categories
                 .Include(x => x.Feeds)
                 .OrderBy(x => x.Name)
+                .AsNoTracking()
                 .ToListAsync();
 
         public async Task<Feed> GetFeed(Guid id)
@@ -42,6 +44,7 @@ namespace BlazorRss.App.Models
                 .OrderByDescending(x => x.DatePublished)
                 .Skip(skip)
                 .Take(take)
+                .AsNoTracking()
                 .ToListAsync();
     }
 }

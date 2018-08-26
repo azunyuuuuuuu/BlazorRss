@@ -60,7 +60,9 @@
 
     async Task LoadData()
     {
-        feeds = await _context.Feeds.ToListAsync();
+        feeds = await _context.Feeds
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     string NewFeedUrl;
