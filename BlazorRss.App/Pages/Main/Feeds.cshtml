@@ -1,4 +1,5 @@
 @using System
+@using BlazorRss.App.Components
 @using BlazorRss.Shared.Models
 @using Humanizer;
 
@@ -74,18 +75,6 @@
     </div>
 
     <div class="ui eight wide column">
-        @if (_article == null)
-        {
-            <div class="ui center aligned disabled basic segment">No article loaded</div>
-        }
-        else
-        {
-            <div id="articledescription" class="ui secondary basic segment">
-                @((MarkupString)@_article.Description)
-            </div>
-            <div id="articleview" class="ui basic segment">
-                @((MarkupString)@_article.Content)
-            </div>
-        }
+        <ArticleView ArticleId="@ArticleId" />
     </div>
 </div>

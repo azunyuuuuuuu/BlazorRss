@@ -29,7 +29,6 @@ namespace BlazorRss.App.Pages.Main
         [Parameter] public Guid ArticleId { get; set; }
 
         public Feed _feed { get; private set; }
-        public Article _article { get; private set; }
 
         protected override async Task OnInitAsync()
         {
@@ -43,17 +42,11 @@ namespace BlazorRss.App.Pages.Main
                 _feed = await _context.GetFeed(FeedId);
                 Articles = await _context.GetArticlesForFeed(FeedId);
             }
-
-            if (ArticleId != null && ArticleId != Guid.Empty)
-            {
-                _article = await _context.Articles.FindAsync(ArticleId);
-            }
         }
 
         public void NavigateToFeed(Guid feedid)
         {
             _feed = null;
-            _article = null;
             FeedId = Guid.Empty;
             ArticleId = Guid.Empty;
 
@@ -61,13 +54,6 @@ namespace BlazorRss.App.Pages.Main
         }
 
         public void NavigateToArticle(Guid feedid, Guid articleid)
-        {
-            // _feed = null;
-            // _article = null;
-            // FeedId = Guid.Empty;
-            // ArticleId = Guid.Empty;
-
-            _uriHelper.NavigateTo($"/feeds/{feedid}/{articleid}");
-        }
+            => ArticleId = articleid;
     }
 }

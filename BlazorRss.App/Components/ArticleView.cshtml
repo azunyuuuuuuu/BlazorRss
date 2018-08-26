@@ -1,0 +1,17 @@
+@using BlazorRss.Shared.Models
+
+@inherits ArticleViewBase
+
+@if (_article == null)
+{
+    <div class="ui center aligned disabled basic segment">No article loaded</div>
+}
+else
+{
+    <div id="articledescription" class="ui secondary basic segment">
+        @((MarkupString)@_article.Description)
+    </div>
+    <div id="articleview" class="ui basic segment">
+        @((MarkupString)@_article.Content)
+    </div>
+}
