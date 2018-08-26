@@ -69,7 +69,11 @@
         if(string.IsNullOrWhiteSpace(NewFeedUrl))
             return;
 
-        _context.Feeds.Add(new Feed{ Url = NewFeedUrl });
+        if(!Uri.IsWellFormedUriString(NewFeedUrl, UriKind.Absolute))
+            return; // TODO: Implement proper Url checking
+
+        var uri = new Uri(NewFeedUrl);
+        _context.Feeds.Add(new Feed{ Url = uri.ToString() });
         await _context.SaveChangesAsync();
         NewFeedUrl = "";
 
