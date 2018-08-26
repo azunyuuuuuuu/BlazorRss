@@ -1,4 +1,5 @@
 @using BlazorRss.Shared.Models
+@using Humanizer;
 
 @inherits ArticleViewBase
 
@@ -9,7 +10,13 @@
 else
 {
     <div id="articledescription" class="ui secondary basic segment">
-        @((MarkupString)@_article.Description)
+        <h3 class="ui header">
+            @_article.Title
+
+            <div class="sub header">
+                By @_article.Author, published @_article.DatePublished.Humanize(), <a href="@_article.ArticleUrl" target="_blank">Source</a>
+            </div>
+        </h3>
     </div>
     <div id="articleview" class="ui basic segment">
         @((MarkupString)@_article.Content)
