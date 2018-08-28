@@ -116,7 +116,9 @@ namespace BlazorRss.App.Services
                     var item = await feedreader.ReadItem();
                     var itemidentifier = item.Links.FirstOrDefault().Uri.AbsoluteUri;
 
-                    if (feed.Articles.Where(x => x.UniqueId == itemidentifier && x.DateUpdated == item.LastUpdated).Count() > 0)
+                    if (feed.Articles
+                        .Where(x => x.UniqueId == itemidentifier)
+                        .Count() > 0)
                         break;
 
                     var article = CreateArticleFromItem(feed, item, itemidentifier);
