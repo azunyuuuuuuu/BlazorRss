@@ -123,13 +123,7 @@ namespace BlazorRss.App.Services
 
                     var article = CreateArticleFromItem(feed, item, itemidentifier);
 
-                    var parsedarticlepage = await SmartReader.Reader.ParseArticleAsync(article.ArticleUrl);
-
-                    if (parsedarticlepage.IsReadable)
-                    {
-                        article.Description = parsedarticlepage.Excerpt;
-                        article.Content = parsedarticlepage.Content;
-                    }
+                    await ExtendArticleDataWithSmartReader(article);
 
                     context.Articles.Add(article);
 
@@ -139,6 +133,24 @@ namespace BlazorRss.App.Services
                 default:
                     SetFeedNameIfNotSet(feed, await feedreader.ReadContent());
                     break;
+            }
+        }
+
+        private async Task ExtendArticleDataWithSmartReader(Article article)
+        {
+            try
+            {
+                var parsedarticlepage = await SmartReader.Reader.ParseArticleAsync(article.ArticleUrl);
+
+                if (parsedarticlepage.IsReadable)
+                {
+                    article.Description = parsedarticlepage.Excerpt;
+                    article.Content = parsedarticlepage.Content;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An Error occurred while parsing the article {article.ArticleUrl}");
             }
         }
 
