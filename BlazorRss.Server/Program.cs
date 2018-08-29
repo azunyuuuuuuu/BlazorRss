@@ -80,6 +80,8 @@ namespace BlazorRss.Server
             WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(new ConfigurationBuilder()
                     .AddCommandLine(args)
+                    .AddJsonFile("appsettings.json", false)
+                    // .AddJsonFile("appsettings.json", true)
                     .Build())
                 .UseStartup<Startup>()
                 .UseUrls("http://*:5000/")
