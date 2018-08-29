@@ -19,6 +19,6 @@ else
         </h3>
     </div>
     <div id="articleview" class="ui basic segment">
-        @((MarkupString)@_article.Content)
+        @((MarkupString)@CommonMark.CommonMarkConverter.Convert(_article.Content))
     </div>
 }

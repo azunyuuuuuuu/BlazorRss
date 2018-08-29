@@ -139,7 +139,8 @@ namespace BlazorRss.App.Services
         {
             foreach (var article in await context.Articles.Where(x => x.Content == string.Empty).ToListAsync())
             {
-                Task.WaitAny(ExtendArticleWithSmartReader(article), Task.Delay(10000));
+                await ExtendArticleWithSmartReader(article);
+                // Task.WaitAny(ExtendArticleWithSmartReader(article), Task.Delay(10000));
                 await context.SaveChangesAsync();
             }
         }
@@ -149,12 +150,10 @@ namespace BlazorRss.App.Services
             try
             {
                 var parsedarticlepage = await SmartReader.Reader.ParseArticleAsync(article.ArticleUrl);
+                var converter = new ReverseMarkdown.Converter();
 
-                if (parsedarticlepage.IsReadable)
-                {
-                    article.Description = parsedarticlepage.Excerpt;
-                    article.Content = parsedarticlepage.Content;
-                }
+                article.Content = converter.Convert(parsedarticlepage.Content);
+                article.Description = parsedarticlepage.Excerpt;
             }
             catch (Exception ex)
             {
