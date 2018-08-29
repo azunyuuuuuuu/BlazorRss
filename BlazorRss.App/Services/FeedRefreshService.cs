@@ -150,15 +150,10 @@ namespace BlazorRss.App.Services
             try
             {
                 var parsedarticlepage = await SmartReader.Reader.ParseArticleAsync(article.ArticleUrl);
+                var converter = new ReverseMarkdown.Converter();
 
-                if (parsedarticlepage.IsReadable)
-                {
-                    article.Description = parsedarticlepage.Excerpt;
-
-                    var converter = new ReverseMarkdown.Converter();
-                    
-                    article.Content = converter.Convert(parsedarticlepage.Content);
-                }
+                article.Content = converter.Convert(parsedarticlepage.Content);
+                article.Description = parsedarticlepage.Excerpt;
             }
             catch (Exception ex)
             {
