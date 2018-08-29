@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.SyndicationFeed;
-using Html2Markdown;
 
 namespace BlazorRss.App.Services
 {
@@ -140,7 +139,8 @@ namespace BlazorRss.App.Services
         {
             foreach (var article in await context.Articles.Where(x => x.Content == string.Empty).ToListAsync())
             {
-                Task.WaitAny(ExtendArticleWithSmartReader(article), Task.Delay(10000));
+                await ExtendArticleWithSmartReader(article);
+                // Task.WaitAny(ExtendArticleWithSmartReader(article), Task.Delay(10000));
                 await context.SaveChangesAsync();
             }
         }
@@ -155,7 +155,8 @@ namespace BlazorRss.App.Services
                 {
                     article.Description = parsedarticlepage.Excerpt;
 
-                    var converter = new Converter();
+                    var converter = new ReverseMarkdown.Converter();
+                    
                     article.Content = converter.Convert(parsedarticlepage.Content);
                 }
             }
