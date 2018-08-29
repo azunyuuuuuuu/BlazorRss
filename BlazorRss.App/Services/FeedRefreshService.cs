@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.SyndicationFeed;
+using Html2Markdown;
 
 namespace BlazorRss.App.Services
 {
@@ -153,7 +154,9 @@ namespace BlazorRss.App.Services
                 if (parsedarticlepage.IsReadable)
                 {
                     article.Description = parsedarticlepage.Excerpt;
-                    article.Content = parsedarticlepage.Content;
+
+                    var converter = new Converter();
+                    article.Content = converter.Convert(parsedarticlepage.Content);
                 }
             }
             catch (Exception ex)
