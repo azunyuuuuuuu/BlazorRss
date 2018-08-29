@@ -38,6 +38,7 @@ namespace BlazorRss.App.Services
                     {
                         var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
                         await RefreshAllFeedsAsync(context);
+                        await PopulateAllArticleContent(context);
                     }
                 }
                 catch (Exception ex)
@@ -123,8 +124,6 @@ namespace BlazorRss.App.Services
 
                     var article = CreateArticleFromItem(feed, item, itemidentifier);
 
-                    await ExtendArticleDataWithSmartReader(article);
-
                     context.Articles.Add(article);
 
                     await context.SaveChangesAsync();
@@ -136,7 +135,16 @@ namespace BlazorRss.App.Services
             }
         }
 
-        private async Task ExtendArticleDataWithSmartReader(Article article)
+        private async Task PopulateAllArticleContent(ApplicationDbContext context)
+        {
+            foreach (var article in await context.Articles.Where(x => x.Content == string.Empty).ToListAsync())
+            {
+                Task.WaitAny(ExtendArticleWithSmartReader(article), Task.Delay(10000));
+                await context.SaveChangesAsync();
+            }
+        }
+
+        private async Task ExtendArticleWithSmartReader(Article article)
         {
             try
             {
@@ -166,7 +174,8 @@ namespace BlazorRss.App.Services
                 Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
                 ArticleUrl = item.Links.First().Uri.ToString(), // TODO: change this to something proper
                 DatePublished = item.Published,
-                DateUpdated = item.LastUpdated
+                DateUpdated = item.LastUpdated,
+                Content = string.Empty
             };
 
         private void SetFeedNameIfNotSet(Feed feed, ISyndicationContent content)
