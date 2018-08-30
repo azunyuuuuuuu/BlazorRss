@@ -111,6 +111,8 @@ namespace BlazorRss.App.Services
 
         private async Task ParseReadElement(ApplicationDbContext context, Feed feed, ISyndicationFeedReader feedreader)
         {
+            _logger.LogDebug($"Parsing element {feedreader.ElementName}");
+
             switch (feedreader.ElementType)
             {
                 case SyndicationElementType.Item:
@@ -137,10 +139,14 @@ namespace BlazorRss.App.Services
 
         private async Task PopulateAllArticleContent(ApplicationDbContext context)
         {
-            foreach (var article in await context.Articles.Where(x => x.Content == string.Empty).ToListAsync())
+            var articles = await context.Articles.Where(x => x.Content == string.Empty).ToListAsync();
+            _logger.LogDebug($"Populating article content for {articles.Count} articles.");
+
+            foreach (var article in articles)
             {
+                _logger.LogDebug($"Populating article {article.UniqueId}");
+
                 await ExtendArticleWithSmartReader(article);
-                // Task.WaitAny(ExtendArticleWithSmartReader(article), Task.Delay(10000));
                 await context.SaveChangesAsync();
             }
         }
@@ -157,7 +163,7 @@ namespace BlazorRss.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An Error occurred while parsing the article {article.ArticleUrl}");
+                _logger.LogError(ex, $"An Error occurred while parsing the article {article.UniqueId}");
             }
         }
 
