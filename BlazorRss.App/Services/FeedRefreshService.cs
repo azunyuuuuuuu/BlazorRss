@@ -171,7 +171,8 @@ namespace BlazorRss.App.Services
                 Author = item.Contributors.FirstOrDefault()?.Name,
                 Description = item.Description,
                 Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
-                ArticleUrl = item.Links.First().Uri.ToString(), // TODO: change this to something proper
+                ArticleUrl = item.Links.First()?.Uri.ToString(), // TODO: change this to something proper
+                DateAdded = DateTimeOffset.Now,
                 DatePublished = item.Published,
                 DateUpdated = item.LastUpdated,
                 Content = string.Empty

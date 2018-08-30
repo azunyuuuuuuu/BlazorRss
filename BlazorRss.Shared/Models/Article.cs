@@ -11,6 +11,7 @@ namespace BlazorRss.Shared.Models
         public string Title { get; set; }
         public string Author { get; set; }
 
+        public DateTimeOffset DateAdded { get; set; }
         public DateTimeOffset DatePublished { get; set; }
         public DateTimeOffset DateUpdated { get; set; }
 
