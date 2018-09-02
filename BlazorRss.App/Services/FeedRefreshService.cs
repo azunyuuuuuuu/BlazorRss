@@ -56,7 +56,7 @@ namespace BlazorRss.App.Services
         {
             var feeds = await context.Feeds
                 .Include(x => x.Articles)
-                .Where(x => x.DateLastUpdate + x.RefreshInterval >= DateTimeOffset.Now)
+                .Where(x => x.DateLastUpdate + x.RefreshInterval <= DateTimeOffset.Now)
                 .ToListAsync();
 
             _logger.LogInformation($"Refreshing {feeds.Count} feeds");
