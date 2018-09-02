@@ -48,7 +48,11 @@ namespace BlazorRss.App.Pages.Manage
                 return; // TODO: Implement proper Url checking
 
             var uri = new Uri(NewFeedUrl);
-            _context.Feeds.Add(new Feed { Url = uri.ToString() });
+            _context.Feeds.Add(new Feed
+            {
+                Url = uri.ToString(),
+                RefreshInterval = TimeSpan.FromMinutes(10)
+            });
             await _context.SaveChangesAsync();
             NewFeedUrl = "";
 
@@ -95,7 +99,7 @@ namespace BlazorRss.App.Pages.Manage
                         {
                             Name = element.Attribute("text").Value,
                             Url = element.Attribute("xmlUrl").Value,
-                            RefreshInterval = TimeSpan.FromSeconds(10),
+                            RefreshInterval = TimeSpan.FromMinutes(10),
                             DateAdded = DateTimeOffset.UtcNow,
                             Category = category
                         };
