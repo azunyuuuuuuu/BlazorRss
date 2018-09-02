@@ -33,6 +33,7 @@ namespace BlazorRss.App.Pages.Manage
         {
             feeds = await _context.Feeds
                 .AsNoTracking()
+                .OrderBy(x => x.Name)
                 .ToListAsync();
         }
 

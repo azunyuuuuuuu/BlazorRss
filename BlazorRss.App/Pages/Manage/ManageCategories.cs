@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BlazorRss.App.Models;
 using BlazorRss.Shared.Models;
@@ -29,6 +30,7 @@ namespace BlazorRss.App.Pages.Manage
         {
             categories = await _context.Categories
                 .AsNoTracking()
+                .OrderBy(x => x.Name)
                 .ToListAsync();
         }
 
