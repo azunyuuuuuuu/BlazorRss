@@ -137,7 +137,10 @@ namespace BlazorRss.App.Services
 
         private async Task PopulateAllArticleContent(ApplicationDbContext context)
         {
-            var articles = await context.Articles.Where(x => x.Content == string.Empty).ToListAsync();
+            var articles = await context.Articles
+                .Where(x => x.Content == string.Empty)
+                .Take(50)
+                .ToListAsync();
             _logger.LogDebug($"Populating article content for {articles.Count} articles.");
 
             foreach (var article in articles)
