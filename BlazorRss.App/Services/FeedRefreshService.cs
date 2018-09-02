@@ -165,6 +165,7 @@ namespace BlazorRss.App.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An Error occurred while parsing the article {article.UniqueId}");
+                article.Content = $"# error \n\n{ex.ToString()}";
             }
         }
 
