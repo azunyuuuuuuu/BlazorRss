@@ -158,8 +158,8 @@ namespace BlazorRss.App.Services
                 var parsedarticlepage = await SmartReader.Reader.ParseArticleAsync(article.ArticleUrl);
                 var converter = new ReverseMarkdown.Converter();
 
-                article.Content = converter.Convert(parsedarticlepage.Content);
-                article.Description = parsedarticlepage.Excerpt;
+                article.Content = converter.Convert(parsedarticlepage.IsReadable ? parsedarticlepage.Content : article.Description);
+                // article.Description = parsedarticlepage.Excerpt;
             }
             catch (Exception ex)
             {
