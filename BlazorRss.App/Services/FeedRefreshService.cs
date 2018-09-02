@@ -46,7 +46,7 @@ namespace BlazorRss.App.Services
                     _logger.LogError(ex, "An error occurred");
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(1));
+                await Task.Delay(TimeSpan.FromSeconds(15));
             }
 
             _logger.LogInformation("FeedRefreshService is stopping");
@@ -109,7 +109,7 @@ namespace BlazorRss.App.Services
 
         private async Task ParseReadElement(ApplicationDbContext context, Feed feed, ISyndicationFeedReader feedreader)
         {
-            _logger.LogDebug($"Parsing element {feedreader.ElementName}");
+            _logger.LogTrace($"Parsing element {feedreader.ElementName}");
 
             switch (feedreader.ElementType)
             {
