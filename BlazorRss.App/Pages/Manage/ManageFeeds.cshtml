@@ -43,5 +43,13 @@
                 </tr>
             </tfoot>
         </table>
+
+        <form action="" class="ui form">
+            <div class="field">
+                <label for="">OPML Contents</label>
+                <textarea type="text" placeholer="OPML Contents to import..." bind="@OpmlInput" />
+            </div>
+            <button class="ui button" type="submit" onclick="@ActionImportOpml">Import</button>
+        </form>
     }
 </div>

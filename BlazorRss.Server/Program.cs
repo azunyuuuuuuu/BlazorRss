@@ -28,8 +28,12 @@ namespace BlazorRss.Server
             var services = scope.ServiceProvider;
             var logger = services.GetRequiredService<ILogger<Program>>();
 
-            await SeedWithSampleDataAsync(services.GetRequiredService<ApplicationDbContext>(), logger);
+            // await SeedWithSampleDataAsync(services.GetRequiredService<ApplicationDbContext>(), logger);
+            await InitializeDatabase(services.GetRequiredService<ApplicationDbContext>());
         }
+
+        private static async Task InitializeDatabase(ApplicationDbContext context)
+            => await context.Database.EnsureCreatedAsync();
 
         private static async Task SeedWithSampleDataAsync(ApplicationDbContext context, ILogger<Program> logger)
         {

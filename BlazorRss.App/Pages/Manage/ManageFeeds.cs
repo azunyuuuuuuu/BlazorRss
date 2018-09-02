@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using BlazorRss.App.Models;
 using BlazorRss.Shared.Models;
 using Microsoft.AspNetCore.Blazor.Components;
@@ -67,6 +68,59 @@ namespace BlazorRss.App.Pages.Manage
         public void ActionEditFeed(Feed feed)
         {
             _uriHelper.NavigateTo($"/manage/feeds/{feed.FeedId}");
+        }
+
+        public string OpmlInput { get; set; }
+        public async Task ActionImportOpml()
+        {
+            var document = XDocument.Parse(OpmlInput);
+            var elements = document.Element("opml").Element("body").Elements("outline");
+            await ParseOutlineElements(elements);
+        }
+
+        private async Task ParseOutlineElements(IEnumerable<XElement> elements, Category category = null)
+        {
+            foreach (var element in elements)
+                switch (element.Attribute("type")?.Value)
+                {
+                    case "rss":
+                        var feed = await _context.Feeds
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(x => x.Url == element.Attribute("xmlUrl").Value);
+
+                        if (feed != null)
+                            break;
+
+                        feed = new Feed
+                        {
+                            Name = element.Attribute("text").Value,
+                            Url = element.Attribute("xmlUrl").Value,
+                            RefreshInterval = TimeSpan.FromSeconds(10),
+                            DateAdded = DateTimeOffset.UtcNow,
+                            Category = category
+                        };
+
+                        await _context.Feeds.AddAsync(feed);
+                        await _context.SaveChangesAsync();
+
+                        break;
+
+                    default:
+                        category = _context.Categories
+                            .AsNoTracking()
+                            .FirstOrDefault(x => x.Name == element.Attribute("text").Value);
+
+                        if (category == null)
+                        {
+                            category = new Category { Name = element.Attribute("text").Value };
+                            await _context.Categories.AddAsync(category);
+                            await _context.SaveChangesAsync();
+                        }
+
+                        await ParseOutlineElements(element.Elements("outline"), category);
+
+                        break;
+                }
         }
     }
 }
