@@ -79,7 +79,11 @@ namespace BlazorRss.App.Pages.Manage
         {
             var document = XDocument.Parse(OpmlInput);
             var elements = document.Element("opml").Element("body").Elements("outline");
+
             await ParseOutlineElements(elements);
+            OpmlInput = "";
+            
+            await LoadData();
         }
 
         private async Task ParseOutlineElements(IEnumerable<XElement> elements, Category category = null)
