@@ -23,5 +23,6 @@ namespace BlazorRss.Shared.Models
         public bool Read { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsSponsored { get; set; }
+        public bool IsReadable { get; set; }
     }
 }

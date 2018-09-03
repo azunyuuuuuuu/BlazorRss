@@ -197,7 +197,9 @@ namespace BlazorRss.App.Services
                 Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
 
                 Read = false,
-                Deleted = false
+                IsDeleted = false,
+                IsSponsored = false,
+                IsReadable=false
             };
 
         private void SetFeedNameIfNotSet(Feed feed, ISyndicationContent content)
