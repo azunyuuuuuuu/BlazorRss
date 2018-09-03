@@ -46,7 +46,7 @@ namespace BlazorRss.App.Services
                     _logger.LogError(ex, "An error occurred");
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(15));
+                await Task.Delay(TimeSpan.FromMinutes(1));
             }
 
             _logger.LogInformation("FeedRefreshService is stopping");
@@ -148,7 +148,7 @@ namespace BlazorRss.App.Services
             var articles = await context.Articles
                 .Where(x => x.Content == string.Empty)
                 .AsTracking()
-                .Take(50)
+                .Take(250)
                 .ToListAsync();
             _logger.LogDebug($"Populating article content for {articles.Count} articles.");
 
