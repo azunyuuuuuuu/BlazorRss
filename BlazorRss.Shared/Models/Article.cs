@@ -21,6 +21,7 @@ namespace BlazorRss.Shared.Models
         public string Tags { get; set; }
 
         public bool Read { get; set; }
-        public bool Deleted { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsSponsored { get; set; }
     }
 }
