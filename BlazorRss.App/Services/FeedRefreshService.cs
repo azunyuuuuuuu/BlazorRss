@@ -183,16 +183,21 @@ namespace BlazorRss.App.Services
             {
                 Feed = feed,
                 UniqueId = itemidentifier,
-                // UniqueId = item.Id,
+
                 Title = item.Title,
                 Author = item.Contributors.FirstOrDefault()?.Name,
-                Description = item.Description,
-                Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
-                ArticleUrl = item.Links.First()?.Uri.ToString(), // TODO: change this to something proper
+
                 DateAdded = DateTimeOffset.Now,
                 DatePublished = item.Published,
                 DateUpdated = item.LastUpdated,
-                Content = string.Empty
+
+                ArticleUrl = item.Links.First()?.Uri.ToString(), // TODO: change this to something proper
+                Description = item.Description,
+                Content = string.Empty,
+                Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
+
+                Read = false,
+                Deleted = false
             };
 
         private void SetFeedNameIfNotSet(Feed feed, ISyndicationContent content)

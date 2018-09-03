@@ -17,5 +17,19 @@ namespace BlazorRss.Shared.Models
         public TimeSpan RefreshInterval { get; set; }
 
         public List<Article> Articles { get; set; }
+
+        public ParserMode ParserMode { get; set; }
+        public string ParserTitle { get; set; }
+        public string ParserDescription { get; set; }
+        public string ParserContent { get; set; }
+        public string ParserAuthor { get; set; }
+        public string ParserTags { get; set; }
+    }
+
+    public enum ParserMode
+    {
+        SmartReader,
+        CssSelector,
+        XPathSelector
     }
 }

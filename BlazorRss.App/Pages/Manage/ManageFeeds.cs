@@ -53,7 +53,11 @@ namespace BlazorRss.App.Pages.Manage
             _context.Feeds.Add(new Feed
             {
                 Url = uri.ToString(),
-                RefreshInterval = TimeSpan.FromMinutes(10)
+
+                DateAdded = DateTimeOffset.Now,
+                RefreshInterval = TimeSpan.FromMinutes(10),
+
+                ParserMode = ParserMode.SmartReader
             });
             await _context.SaveChangesAsync();
             NewFeedUrl = "";
@@ -84,7 +88,7 @@ namespace BlazorRss.App.Pages.Manage
 
             await ParseOutlineElements(elements);
             OpmlInput = "";
-            
+
             await LoadData();
         }
 
@@ -105,11 +109,15 @@ namespace BlazorRss.App.Pages.Manage
 
                             var feed = new Feed
                             {
-                                Name = element.Attribute("text").Value,
                                 Url = element.Attribute("xmlUrl").Value,
-                                RefreshInterval = TimeSpan.FromMinutes(10),
+                                Name = element.Attribute("text").Value,
+
                                 DateAdded = DateTimeOffset.UtcNow,
-                                Category = category
+                                RefreshInterval = TimeSpan.FromMinutes(10),
+
+                                Category = category,
+
+                                ParserMode = ParserMode.SmartReader
                             };
 
                             await _context.Feeds.AddAsync(feed);
