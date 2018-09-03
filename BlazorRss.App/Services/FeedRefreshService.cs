@@ -111,27 +111,35 @@ namespace BlazorRss.App.Services
         {
             _logger.LogTrace($"Parsing element {feedreader.ElementName}");
 
-            switch (feedreader.ElementType)
+            try
             {
-                case SyndicationElementType.Item:
-                    var item = await feedreader.ReadItem();
-                    var itemidentifier = item.Links.FirstOrDefault().Uri.AbsoluteUri;
+                switch (feedreader.ElementType)
+                {
+                    case SyndicationElementType.Item:
+                        var item = await feedreader.ReadItem();
+                        var itemidentifier = item.Links.FirstOrDefault().Uri.AbsoluteUri;
 
-                    if (feed.Articles
-                        .Where(x => x.UniqueId == itemidentifier)
-                        .Count() > 0)
+                        if (await context.Articles
+                            .Where(x => x.UniqueId == itemidentifier)
+                            .AsNoTracking()
+                            .CountAsync() > 0)
+                            break;
+
+                        var article = CreateArticleFromItem(feed, item, itemidentifier);
+
+                        context.Articles.Add(article);
+
+                        await context.SaveChangesAsync();
                         break;
 
-                    var article = CreateArticleFromItem(feed, item, itemidentifier);
-
-                    context.Articles.Add(article);
-
-                    await context.SaveChangesAsync();
-                    break;
-
-                default:
-                    SetFeedNameIfNotSet(feed, await feedreader.ReadContent());
-                    break;
+                    default:
+                        SetFeedNameIfNotSet(feed, await feedreader.ReadContent());
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while refreshing \"{feed.Name}\"");
             }
         }
 
