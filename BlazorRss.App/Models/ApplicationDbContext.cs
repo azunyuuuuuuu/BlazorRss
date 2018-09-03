@@ -14,6 +14,12 @@ namespace BlazorRss.App.Models
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Article>()
+                .HasAlternateKey(x => x.UniqueId);
+        }
+
         public DbSet<Category> Categories { get; set; }
         public DbSet<Feed> Feeds { get; set; }
         public DbSet<Article> Articles { get; set; }

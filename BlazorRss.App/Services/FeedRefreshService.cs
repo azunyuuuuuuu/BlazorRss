@@ -139,6 +139,7 @@ namespace BlazorRss.App.Services
         {
             var articles = await context.Articles
                 .Where(x => x.Content == string.Empty)
+                .AsTracking()
                 .Take(50)
                 .ToListAsync();
             _logger.LogDebug($"Populating article content for {articles.Count} articles.");
