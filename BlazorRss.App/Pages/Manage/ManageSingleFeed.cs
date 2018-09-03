@@ -57,5 +57,16 @@ namespace BlazorRss.App.Pages.Manage
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task CleanArticleContents()
+        {
+            foreach (var article in await _context.Articles
+                .Include(x => x.Feed)
+                .Where(x => x.Feed == feed)
+                .ToListAsync())
+                article.Content = string.Empty;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
