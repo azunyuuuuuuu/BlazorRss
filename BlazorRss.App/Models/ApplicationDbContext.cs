@@ -17,7 +17,8 @@ namespace BlazorRss.App.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Article>()
-                .HasAlternateKey(x => x.UniqueId);
+                .HasIndex(x=>x.UniqueId)
+                .IsUnique();
         }
 
         public DbSet<Category> Categories { get; set; }
