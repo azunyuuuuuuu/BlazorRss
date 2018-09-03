@@ -95,65 +95,76 @@ namespace BlazorRss.App.Pages.Manage
         private async Task ParseOutlineElements(IEnumerable<XElement> elements, Category category = null)
         {
             foreach (var element in elements)
+                await ParseOutlineElement(category, element);
+        }
+
+        private async Task ParseOutlineElement(Category category, XElement element)
+        {
+            try
             {
-                try
+                switch (element.Attribute("type")?.Value)
                 {
-                    switch (element.Attribute("type")?.Value)
-                    {
-                        case "rss":
-                            if (0 < await _context.Feeds
-                                .AsNoTracking()
-                                .Where(x => x.Url == element.Attribute("xmlUrl").Value)
-                                .CountAsync())
-                                break;
+                    case "rss":
+                        await ParseOutlineElementRss(category, element);
+                        break;
 
-                            var feed = new Feed
-                            {
-                                Url = element.Attribute("xmlUrl").Value,
-                                Name = element.Attribute("text").Value,
-
-                                DateAdded = DateTimeOffset.UtcNow,
-                                RefreshInterval = TimeSpan.FromMinutes(10),
-
-                                Category = category,
-
-                                ParserMode = ParserMode.SmartReader
-                            };
-
-                            await _context.Feeds.AddAsync(feed);
-                            await _context.SaveChangesAsync();
-
-                            break;
-
-                        default:
-                            if (0 < await _context.Categories
-                                .AsNoTracking()
-                                .Where(x => x.Name == element.Attribute("text").Value)
-                                .CountAsync())
-                            {
-                                await ParseOutlineElements(element.Elements("outline"),
-                                    await _context.Categories.SingleAsync(x => x.Name == element.Attribute("text").Value));
-                            }
-                            else
-                            {
-                                var _category = new Category
-                                {
-                                    Name = element.Attribute("text").Value
-                                };
-                                await _context.Categories.AddAsync(_category);
-                                await _context.SaveChangesAsync();
-
-                                await ParseOutlineElements(element.Elements("outline"), _category);
-                            }
-
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error while parsing OPML data");
+                    default:
+                        await ParseOutlineElementDefault(element);
+                        break;
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while parsing OPML data");
+            }
+        }
+
+        private async Task ParseOutlineElementDefault(XElement element)
+        {
+            if (await _context.Categories
+                .AsNoTracking()
+                .Where(x => x.Name == element.Attribute("text").Value)
+                .CountAsync() > 0)
+            {
+                await ParseOutlineElements(element.Elements("outline"),
+                    await _context.Categories.SingleAsync(x => x.Name == element.Attribute("text").Value));
+            }
+            else
+            {
+                var _category = new Category
+                {
+                    Name = element.Attribute("text").Value
+                };
+                await _context.Categories.AddAsync(_category);
+                await _context.SaveChangesAsync();
+
+                await ParseOutlineElements(element.Elements("outline"), _category);
+            }
+        }
+
+        private async Task ParseOutlineElementRss(Category category, XElement element)
+        {
+            if (await _context.Feeds
+                .AsNoTracking()
+                .Where(x => x.Url == element.Attribute("xmlUrl").Value)
+                .CountAsync() > 0)
+                return;
+
+            var feed = new Feed
+            {
+                Url = element.Attribute("xmlUrl").Value,
+                Name = element.Attribute("text").Value,
+
+                DateAdded = DateTimeOffset.UtcNow,
+                RefreshInterval = TimeSpan.FromMinutes(10),
+
+                Category = category,
+
+                ParserMode = ParserMode.SmartReader
+            };
+
+            await _context.Feeds.AddAsync(feed);
+            await _context.SaveChangesAsync();
         }
     }
 }
