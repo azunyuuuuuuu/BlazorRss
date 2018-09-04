@@ -190,12 +190,15 @@ namespace BlazorRss.App.Services
                     case ParserMode.XPathSelector:
                         break;
                 }
-
-                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error occurred while processing {article.ArticleUrl}");
+                article.Content = $"# Error\n\n{ex.ToString()}";
+            }
+            finally
+            {
+                await context.SaveChangesAsync();
             }
         }
 
@@ -208,11 +211,15 @@ namespace BlazorRss.App.Services
                 _logger.LogTrace($"Downloading raw article from {article.ArticleUrl}");
 
                 article.RawContent = await _client.GetStringAsync(article.ArticleUrl);
-                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error occurred while downloading {article.ArticleUrl}");
+                article.RawContent = $"# Error\n\n{ex.ToString()}";
+            }
+            finally
+            {
+                await context.SaveChangesAsync();
             }
         }
 
