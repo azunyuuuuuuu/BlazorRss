@@ -231,6 +231,7 @@ namespace BlazorRss.App.Services
 
                 ArticleUrl = item.Links.First()?.Uri.ToString(), // TODO: change this to something proper
                 Description = item.Description,
+                RawContent = string.Empty,
                 Content = string.Empty,
                 Tags = string.Join(", ", item.Categories.Select(x => x.Name)),
 
