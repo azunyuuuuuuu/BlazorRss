@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.SyndicationFeed;
+using HtmlAgilityPack;
+using HtmlAgilityPack.CssSelectors.NetCore;
 
 namespace BlazorRss.App.Services
 {
@@ -169,6 +171,8 @@ namespace BlazorRss.App.Services
                 if (!string.IsNullOrWhiteSpace(article.Content))
                     return;
 
+                var converter = new ReverseMarkdown.Converter();
+
                 switch (article.Feed.ParserMode)
                 {
                     default:
@@ -176,7 +180,6 @@ namespace BlazorRss.App.Services
                         _logger.LogTrace($"Parsing article content for {article.ArticleUrl}");
 
                         var parsedarticle = SmartReader.Reader.ParseArticle(article.ArticleUrl, article.RawContent);
-                        var converter = new ReverseMarkdown.Converter();
 
                         article.Content = converter.Convert(parsedarticle.IsReadable ? parsedarticle.Content : article.Description);
                         if (string.IsNullOrWhiteSpace(article.Content))
@@ -185,6 +188,16 @@ namespace BlazorRss.App.Services
                         break;
 
                     case ParserMode.CssSelector:
+                        var html = new HtmlDocument();
+                        html.LoadHtml(article.RawContent);
+                        var document = html.DocumentNode;
+
+                        article.Title = document.QuerySelector(article.Feed.ParserTitle)?.InnerText;
+                        article.Description = document.QuerySelector(article.Feed.ParserDescription)?.InnerText;
+                        article.Content = converter.Convert(document.QuerySelector(article.Feed.ParserContent)?.InnerHtml);
+                        var temp4 = document.QuerySelector(article.Feed.ParserAuthor);
+                        var temp5 = document.QuerySelector(article.Feed.ParserTags);
+
                         break;
 
                     case ParserMode.XPathSelector:
