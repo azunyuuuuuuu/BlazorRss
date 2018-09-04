@@ -147,34 +147,72 @@ namespace BlazorRss.App.Services
         {
             var articles = await context.Articles
                 .Where(x => x.Content == string.Empty)
+                .Include(x => x.Feed)
                 .AsTracking()
                 .Take(250)
                 .ToListAsync();
-            _logger.LogDebug($"Populating article content for {articles.Count} articles.");
+            _logger.LogDebug($"Downloading article content for {articles.Count} articles.");
 
             foreach (var article in articles)
             {
-                _logger.LogDebug($"Populating article {article.UniqueId}");
+                _logger.LogDebug($"Downloading article {article.UniqueId}");
 
-                await ExtendArticleWithSmartReader(article);
-                await context.SaveChangesAsync();
+                await DownloadArticleRawContent(context, article);
+                await ProcessArticleRawContent(context, article);
             }
         }
 
-        private async Task ExtendArticleWithSmartReader(Article article)
+        private async Task ProcessArticleRawContent(ApplicationDbContext context, Article article)
         {
             try
             {
-                var parsedarticlepage = await SmartReader.Reader.ParseArticleAsync(article.ArticleUrl);
-                var converter = new ReverseMarkdown.Converter();
+                if (!string.IsNullOrWhiteSpace(article.Content))
+                    return;
 
-                article.Content = converter.Convert(parsedarticlepage.IsReadable ? parsedarticlepage.Content : article.Description);
-                // article.Description = parsedarticlepage.Excerpt;
+                switch (article.Feed.ParserMode)
+                {
+                    default:
+                    case ParserMode.SmartReader:
+                        _logger.LogTrace($"Parsing article content for {article.ArticleUrl}");
+
+                        var parsedarticle = SmartReader.Reader.ParseArticle(article.ArticleUrl, article.RawContent);
+                        var converter = new ReverseMarkdown.Converter();
+
+                        article.Content = converter.Convert(parsedarticle.IsReadable ? parsedarticle.Content : article.Description);
+                        if (string.IsNullOrWhiteSpace(article.Content))
+                            article.Content = "###### no content";
+                        // article.Description = parsedarticlepage.Excerpt
+                        break;
+
+                    case ParserMode.CssSelector:
+                        break;
+
+                    case ParserMode.XPathSelector:
+                        break;
+                }
+
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An Error occurred while parsing the article {article.UniqueId}");
-                article.Content = $"# error \n\n{ex.ToString()}";
+                _logger.LogError(ex, $"An error occurred while processing {article.ArticleUrl}");
+            }
+        }
+
+        private async Task DownloadArticleRawContent(ApplicationDbContext context, Article article)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(article.RawContent))
+                    return;
+                _logger.LogTrace($"Downloading raw article from {article.ArticleUrl}");
+
+                article.RawContent = await _client.GetStringAsync(article.ArticleUrl);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while downloading {article.ArticleUrl}");
             }
         }
 
@@ -199,7 +237,7 @@ namespace BlazorRss.App.Services
                 Read = false,
                 IsDeleted = false,
                 IsSponsored = false,
-                IsReadable=false
+                IsReadable = false
             };
 
         private void SetFeedNameIfNotSet(Feed feed, ISyndicationContent content)
