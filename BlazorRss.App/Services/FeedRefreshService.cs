@@ -146,7 +146,7 @@ namespace BlazorRss.App.Services
         private async Task PopulateAllArticleContent(ApplicationDbContext context)
         {
             var articles = await context.Articles
-                .Where(x => x.Content == string.Empty)
+                .Where(x => x.RawContent == string.Empty || x.Content == string.Empty)
                 .Include(x => x.Feed)
                 .AsTracking()
                 .Take(250)
