@@ -150,6 +150,7 @@ namespace BlazorRss.App.Services
             var articles = await context.Articles
                 .Where(x => x.RawContent == string.Empty || x.Content == string.Empty)
                 .Include(x => x.Feed)
+                .OrderByDescending(x => x.DateAdded)
                 .AsTracking()
                 .Take(250)
                 .ToListAsync();
@@ -177,30 +178,15 @@ namespace BlazorRss.App.Services
                 {
                     default:
                     case ParserMode.SmartReader:
-                        _logger.LogTrace($"Parsing article content for {article.ArticleUrl}");
-
-                        var parsedarticle = SmartReader.Reader.ParseArticle(article.ArticleUrl, article.RawContent);
-
-                        article.Content = converter.Convert(parsedarticle.IsReadable ? parsedarticle.Content : article.Description);
-                        if (string.IsNullOrWhiteSpace(article.Content))
-                            article.Content = "###### no content";
-                        // article.Description = parsedarticlepage.Excerpt
+                        ProcessArticleRawContentSmartReader(article, converter);
                         break;
 
                     case ParserMode.CssSelector:
-                        var html = new HtmlDocument();
-                        html.LoadHtml(article.RawContent);
-                        var document = html.DocumentNode;
-
-                        article.Title = document.QuerySelector(article.Feed.ParserTitle)?.InnerText;
-                        article.Description = document.QuerySelector(article.Feed.ParserDescription)?.InnerText;
-                        article.Content = converter.Convert(document.QuerySelector(article.Feed.ParserContent)?.InnerHtml);
-                        var temp4 = document.QuerySelector(article.Feed.ParserAuthor);
-                        var temp5 = document.QuerySelector(article.Feed.ParserTags);
-
+                        ProcessArticleRawContentCssSelector(article, converter);
                         break;
 
                     case ParserMode.XPathSelector:
+                        ProcessArticleRawContentXPathSelector(article, converter);
                         break;
                 }
             }
@@ -213,6 +199,46 @@ namespace BlazorRss.App.Services
             {
                 await context.SaveChangesAsync();
             }
+        }
+
+        private static void ProcessArticleRawContentXPathSelector(Article article, ReverseMarkdown.Converter converter)
+        {
+            var html = new HtmlDocument();
+            html.LoadHtml(article.RawContent);
+            var document = html.DocumentNode;
+
+            article.Title = document.SelectSingleNode(article.Feed.ParserTitle)?.InnerText;
+            article.Description = document.SelectSingleNode(article.Feed.ParserDescription)?.InnerText;
+            article.Content = converter.Convert(
+                string.Join("", document.SelectNodes(article.Feed.ParserContent)
+                    ?.Select(x => x.OuterHtml))
+                );
+            article.Author = document.SelectSingleNode(article.Feed.ParserAuthor)?.InnerText;
+            article.Tags = string.Join(", ", document.SelectNodes(article.Feed.ParserTags)?.Select(x => x.InnerText));
+        }
+
+        private static void ProcessArticleRawContentCssSelector(Article article, ReverseMarkdown.Converter converter)
+        {
+            var html = new HtmlDocument();
+            html.LoadHtml(article.RawContent);
+            var document = html.DocumentNode;
+
+            article.Title = document.QuerySelector(article.Feed.ParserTitle)?.InnerText;
+            article.Description = document.QuerySelector(article.Feed.ParserDescription)?.InnerText;
+            article.Content = converter.Convert(document.QuerySelector(article.Feed.ParserContent)?.InnerHtml);
+            var temp4 = document.QuerySelector(article.Feed.ParserAuthor);
+            var temp5 = document.QuerySelector(article.Feed.ParserTags);
+        }
+
+        private void ProcessArticleRawContentSmartReader(Article article, ReverseMarkdown.Converter converter)
+        {
+            _logger.LogTrace($"Parsing article content for {article.ArticleUrl}");
+
+            var parsedarticle = SmartReader.Reader.ParseArticle(article.ArticleUrl, article.RawContent);
+
+            article.Content = converter.Convert(parsedarticle.IsReadable ? parsedarticle.Content : article.Description);
+            if (string.IsNullOrWhiteSpace(article.Content))
+                article.Content = "###### no content";
         }
 
         private async Task DownloadArticleRawContent(ApplicationDbContext context, Article article)
