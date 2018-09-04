@@ -29,6 +29,7 @@ namespace BlazorRss.App.Pages.Manage
         [Parameter] public Guid FeedId { get; set; }
 
         public string categoryid { get; set; }
+        public string parsermode { get; set; }
 
         protected override async Task OnParametersSetAsync()
         {
@@ -44,6 +45,8 @@ namespace BlazorRss.App.Pages.Manage
             if (feed.Category != null)
                 categoryid = feed.Category.CategoryId.ToString();
 
+            parsermode = feed.ParserMode.ToString();
+
             categories = await _context.Categories
                 .ToListAsync();
         }
@@ -52,6 +55,8 @@ namespace BlazorRss.App.Pages.Manage
         {
             if (categoryid != null)
                 feed.Category = categories.Single(x => x.CategoryId == Guid.Parse(categoryid));
+
+            feed.ParserMode = (ParserMode)Enum.Parse(typeof(ParserMode), parsermode);
 
             _context.Update(feed);
 

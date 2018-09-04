@@ -18,11 +18,14 @@
                 <label>Name</label>
                 <input type="text" bind="@feed.Name" placeholder="Name..." />
             </div>
+
             <div class="field">
                 <label>URL</label>
                 <input type="text" bind="@feed.Url" placeholder="URL..." />
             </div>
+
             <div class="field">
+                <label>Category</label>
                 <select class="ui fluid dropdown" bind="categoryid">
                     @if (categories != null)
                     {
@@ -33,7 +36,40 @@
                     }
                 </select>
             </div>
+
+            <div class="field">
+                <label>Parser Mode for Articles</label>
+                <select name="" id="" class="ui dropdown" bind="parsermode">
+                    @foreach (var mode in Enum.GetNames(typeof(ParserMode)))
+                    {
+                        <option value=@mode>@mode</option>
+                    }
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Parser Title</label>
+                <input type="text" bind="@feed.ParserTitle" />
+            </div>
+            <div class="field">
+                <label>Parser Description</label>
+                <input type="text" bind="@feed.ParserDescription" />
+            </div>
+            <div class="field">
+                <label>Parser Content</label>
+                <input type="text" bind="@feed.ParserContent" />
+            </div>
+            <div class="field">
+                <label>Parser Author</label>
+                <input type="text" bind="@feed.ParserAuthor" />
+            </div>
+            <div class="field">
+                <label>Parser Tags</label>
+                <input type="text" bind="@feed.ParserTags" />
+            </div>
+
             <div class="ui button" onclick=@CleanArticleContents>Clean Article Contents</div>
+
             <div class="ui primary button" onclick=@SaveData>Save</div>
         </form>
     }
