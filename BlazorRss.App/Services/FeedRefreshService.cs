@@ -149,22 +149,27 @@ namespace BlazorRss.App.Services
 
         private async Task PopulateAllArticleContent(ApplicationDbContext context)
         {
-            var articles = await context.Articles
-                .Where(x => x.RawContent == string.Empty || x.Content == string.Empty)
+            foreach (var article in await context.Articles
+                .Where(x => x.RawContent == string.Empty)
                 .Include(x => x.Feed)
                 .OrderByDescending(x => x.DateAdded)
                 .AsTracking()
-                .Take(250)
-                .ToListAsync();
-            _logger.LogDebug($"Downloading article content for {articles.Count} articles.");
-
-            foreach (var article in articles)
+                .Take(100)
+                .ToListAsync())
             {
-                _logger.LogDebug($"Downloading article {article.UniqueId}");
-
                 await DownloadArticleRawContent(context, article);
+            }
+
+            foreach (var article in await context.Articles
+                .Where(x => x.Content == string.Empty)
+                .Where(x => x.RawContent != string.Empty)
+                .Include(x => x.Feed)
+                .AsTracking()
+                .ToListAsync())
+            {
                 await ProcessArticleRawContent(context, article);
             }
+
         }
 
         private async Task ProcessArticleRawContent(ApplicationDbContext context, Article article)
