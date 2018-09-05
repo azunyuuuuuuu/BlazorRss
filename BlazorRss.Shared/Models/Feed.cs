@@ -30,6 +30,7 @@ namespace BlazorRss.Shared.Models
     {
         SmartReader,
         CssSelector,
-        XPathSelector
+        XPathSelector,
+        YouTube
     }
 }

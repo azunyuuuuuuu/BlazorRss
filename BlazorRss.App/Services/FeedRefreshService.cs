@@ -12,6 +12,8 @@ using System.Net.Http;
 using Microsoft.SyndicationFeed;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
+using ReverseMarkdown;
+using System.Text.RegularExpressions;
 
 namespace BlazorRss.App.Services
 {
@@ -188,6 +190,10 @@ namespace BlazorRss.App.Services
                     case ParserMode.XPathSelector:
                         ProcessArticleRawContentXPathSelector(article, converter);
                         break;
+
+                    case ParserMode.YouTube:
+                        ProcessArticleRawContentYouTube(article, converter);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -201,7 +207,17 @@ namespace BlazorRss.App.Services
             }
         }
 
-        private static void ProcessArticleRawContentXPathSelector(Article article, ReverseMarkdown.Converter converter)
+        private void ProcessArticleRawContentYouTube(Article article, Converter converter)
+        {
+            var match = Regex.Match(article.ArticleUrl,
+                @"(?:youtube.com\/watch\?v=|youtube.com\/v\/|youtu.be\/)(.{11})",
+                RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            var videoid = match.Groups[1].Value;
+
+            article.Content = $"<iframe width=\"560\" height=\"315\" src=\"https://www.youtube-nocookie.com/embed/{videoid}\" frameborder=\"0\" allow=\"autoplay; encrypted-media\" allowfullscreen></iframe>";
+        }
+
+        private void ProcessArticleRawContentXPathSelector(Article article, ReverseMarkdown.Converter converter)
         {
             var html = new HtmlDocument();
             html.LoadHtml(article.RawContent);
@@ -217,7 +233,7 @@ namespace BlazorRss.App.Services
             article.Tags = string.Join(", ", document.SelectNodes(article.Feed.ParserTags)?.Select(x => x.InnerText));
         }
 
-        private static void ProcessArticleRawContentCssSelector(Article article, ReverseMarkdown.Converter converter)
+        private void ProcessArticleRawContentCssSelector(Article article, ReverseMarkdown.Converter converter)
         {
             var html = new HtmlDocument();
             html.LoadHtml(article.RawContent);

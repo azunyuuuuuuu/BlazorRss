@@ -57,7 +57,7 @@ namespace BlazorRss.App.Pages.Manage
                 DateAdded = DateTimeOffset.Now,
                 RefreshInterval = TimeSpan.FromMinutes(10),
 
-                ParserMode = ParserMode.SmartReader
+                ParserMode = uri.ToString().Contains("youtube.com/") ? ParserMode.YouTube : ParserMode.SmartReader
             });
             await _context.SaveChangesAsync();
             NewFeedUrl = "";
@@ -160,7 +160,7 @@ namespace BlazorRss.App.Pages.Manage
 
                 Category = category,
 
-                ParserMode = ParserMode.SmartReader
+                ParserMode = element.Attribute("xmlUrl").Value.ToString().Contains("youtube.com/") ? ParserMode.YouTube : ParserMode.SmartReader
             };
 
             await _context.Feeds.AddAsync(feed);
