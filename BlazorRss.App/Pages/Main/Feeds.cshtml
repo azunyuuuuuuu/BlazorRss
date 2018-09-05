@@ -1,7 +1,8 @@
 @using System
+@using System.Linq
 @using BlazorRss.App.Components
 @using BlazorRss.Shared.Models
-@using Humanizer;
+@using Humanizer
 
 @page "/feeds/"
 @page "/feeds/{feedid:guid}"
@@ -21,7 +22,7 @@
                     </a>
 
                     <div class="menu">
-                        @foreach (var feed in category.Feeds)
+                        @foreach (var feed in category.Feeds.OrderBy(x=>x.Name))
                         {
                             if (feed.FeedId == FeedId)
                             {
