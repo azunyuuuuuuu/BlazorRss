@@ -69,10 +69,17 @@ namespace BlazorRss.App.Pages.Manage
                 .Include(x => x.Feed)
                 .Where(x => x.Feed == feed)
                 .ToListAsync())
-            {
-                article.RawContent = string.Empty;
                 article.Content = string.Empty;
-            }
+
+            await _context.SaveChangesAsync();
+        }
+        public async Task CleanArticleRawContents()
+        {
+            foreach (var article in await _context.Articles
+                .Include(x => x.Feed)
+                .Where(x => x.Feed == feed)
+                .ToListAsync())
+                article.RawContent = string.Empty;
 
             await _context.SaveChangesAsync();
         }
