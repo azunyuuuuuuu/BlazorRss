@@ -5,6 +5,7 @@ using BlazorRss.App.Models;
 using BlazorRss.Shared.Models;
 using Microsoft.AspNetCore.Blazor.Components;
 using Microsoft.AspNetCore.Blazor.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorRss.App.Components
 {
@@ -29,7 +30,9 @@ namespace BlazorRss.App.Components
         {
             if (ArticleId != null && ArticleId != Guid.Empty)
             {
-                _article = await _context.Articles.FindAsync(ArticleId);
+                _article = await _context.Articles
+                    .AsNoTracking()
+                    .SingleAsync(x => x.ArticleId == ArticleId);
             }
         }
     }
