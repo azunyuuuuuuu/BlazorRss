@@ -270,7 +270,15 @@ namespace BlazorRss.App.Services
                     return;
                 _logger.LogTrace($"Downloading raw article from {article.ArticleUrl}");
 
-                article.RawContent = await _client.GetStringAsync(article.ArticleUrl);
+                switch (article.Feed.ParserMode)
+                {
+                    default:
+                        article.RawContent = await _client.GetStringAsync(article.ArticleUrl);
+                        break;
+                    case ParserMode.YouTube:
+                        article.RawContent = "# YouTube";
+                        break;
+                }
             }
             catch (Exception ex)
             {
