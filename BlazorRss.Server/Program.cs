@@ -35,51 +35,6 @@ namespace BlazorRss.Server
         private static async Task InitializeDatabase(ApplicationDbContext context)
             => await context.Database.EnsureCreatedAsync();
 
-        private static async Task SeedWithSampleDataAsync(ApplicationDbContext context, ILogger<Program> logger)
-        {
-            try
-            {
-                await context.Database.EnsureCreatedAsync();
-
-                if ((await context.Categories.CountAsync()) > 0)
-                    return;
-
-                await context.Categories.AddRangeAsync(
-                    new Shared.Models.Category
-                    {
-                        Name = "Test Category",
-                        Feeds = new List<Shared.Models.Feed>
-                        {
-                            new Shared.Models.Feed {
-                                Name = "YouTube: LiveOverflow channel feed",
-                                Url = "https://www.youtube.com/feeds/videos.xml?channel_id=UClcE-kVhqyiHCcjYwcpfj9w",
-                                RefreshInterval = TimeSpan.FromSeconds(10),
-                                DateAdded = DateTimeOffset.UtcNow
-                                },
-                            new Shared.Models.Feed {
-                                Name = "Ars Technica",
-                                Url = "http://feeds.arstechnica.com/arstechnica/index/",
-                                RefreshInterval = TimeSpan.FromSeconds(10),
-                                DateAdded = DateTimeOffset.UtcNow
-                                },
-                            new Shared.Models.Feed {
-                                Name = "Neowin",
-                                Url = "http://feeds.feedburner.com/neowin-main",
-                                RefreshInterval = TimeSpan.FromSeconds(10),
-                                DateAdded = DateTimeOffset.UtcNow
-                                }
-                        }
-                    }
-                );
-
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error during database initialization occurred");
-            }
-        }
-
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(new ConfigurationBuilder()
