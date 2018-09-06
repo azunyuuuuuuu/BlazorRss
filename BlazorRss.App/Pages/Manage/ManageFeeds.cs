@@ -36,6 +36,7 @@ namespace BlazorRss.App.Pages.Manage
         {
             feeds = await _context.Feeds
                 .AsNoTracking()
+                .Include(x => x.Category)
                 .OrderBy(x => x.Name)
                 .ToListAsync();
         }

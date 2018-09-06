@@ -17,6 +17,8 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Category</th>
+                    <th>Parser Mode</th>
                     <th class="right aligned collapsing"></th>
                 </tr>
             </thead>
@@ -25,6 +27,8 @@
                 {
                     <tr>
                         <td>@feed.Name</td>
+                        <td>@feed.Category?.Name</td>
+                        <td>@feed.ParserMode</td>
                         <td class="right aligned">
                             <button class="ui button" onclick="@(e => ActionEditFeed(@feed))">Edit</button>
                             <button class="ui negative button" onclick="@(e => ActionRemoveFeed(@feed))">Delete</button>
