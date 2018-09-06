@@ -28,9 +28,9 @@ namespace BlazorRss.Shared.Models
 
     public enum ParserMode
     {
-        SmartReader,
-        CssSelector,
-        XPathSelector,
-        YouTube
+        None = 0,
+        SmartReader = 1,
+        XPathSelector = 2,
+        YouTube = 3
     }
 }

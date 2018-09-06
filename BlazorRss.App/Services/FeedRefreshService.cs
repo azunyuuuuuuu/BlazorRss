@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.SyndicationFeed;
 using HtmlAgilityPack;
-using HtmlAgilityPack.CssSelectors.NetCore;
 using ReverseMarkdown;
 using System.Text.RegularExpressions;
 
@@ -188,10 +187,6 @@ namespace BlazorRss.App.Services
                         ProcessArticleRawContentSmartReader(article, converter);
                         break;
 
-                    case ParserMode.CssSelector:
-                        ProcessArticleRawContentCssSelector(article, converter);
-                        break;
-
                     case ParserMode.XPathSelector:
                         ProcessArticleRawContentXPathSelector(article, converter);
                         break;
@@ -236,19 +231,6 @@ namespace BlazorRss.App.Services
                 );
             article.Author = document.SelectSingleNode(article.Feed.ParserAuthor)?.InnerText;
             article.Tags = string.Join(", ", document.SelectNodes(article.Feed.ParserTags)?.Select(x => x.InnerText));
-        }
-
-        private void ProcessArticleRawContentCssSelector(Article article, ReverseMarkdown.Converter converter)
-        {
-            var html = new HtmlDocument();
-            html.LoadHtml(article.RawContent);
-            var document = html.DocumentNode;
-
-            article.Title = document.QuerySelector(article.Feed.ParserTitle)?.InnerText;
-            article.Description = document.QuerySelector(article.Feed.ParserDescription)?.InnerText;
-            article.Content = converter.Convert(document.QuerySelector(article.Feed.ParserContent)?.InnerHtml);
-            var temp4 = document.QuerySelector(article.Feed.ParserAuthor);
-            var temp5 = document.QuerySelector(article.Feed.ParserTags);
         }
 
         private void ProcessArticleRawContentSmartReader(Article article, ReverseMarkdown.Converter converter)
