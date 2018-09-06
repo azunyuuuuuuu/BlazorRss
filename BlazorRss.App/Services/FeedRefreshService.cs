@@ -183,6 +183,9 @@ namespace BlazorRss.App.Services
                 switch (article.Feed.ParserMode)
                 {
                     default:
+                    case ParserMode.None:
+                        break;
+                        
                     case ParserMode.SmartReader:
                         ProcessArticleRawContentSmartReader(article, converter);
                         break;
